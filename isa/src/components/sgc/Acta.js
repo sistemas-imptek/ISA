@@ -13,8 +13,6 @@ export class Acta extends Component {
                 <div className="card">
                     <h1>Acta</h1>
                     <p>Aqui se creará el acta</p>
-                    <i class="fa fa-refresh fa-spin fa-3x fa-fw" aria-hidden="true"></i>
-<span class="sr-only">Refreshing...</span>
                 </div>
             </div>
         </div>
