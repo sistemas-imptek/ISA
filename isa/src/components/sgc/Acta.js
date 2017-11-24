@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export class EmptyPage extends Component {
+export class Acta extends Component {
 
     constructor() {
         super();
@@ -11,8 +11,10 @@ export class EmptyPage extends Component {
         return <div className="ui-g">
             <div className="ui-g-12">
                 <div className="card">
-                    <h1>Empty Page</h1>
-                    <p>Use this page to start from scratch and place your custom content.</p>
+                    <h1>Acta</h1>
+                    <p>Aqui se creará el acta</p>
+                    <i class="fa fa-refresh fa-spin fa-3x fa-fw" aria-hidden="true"></i>
+<span class="sr-only">Refreshing...</span>
                 </div>
             </div>
         </div>
