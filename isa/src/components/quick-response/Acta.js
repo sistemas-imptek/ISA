@@ -11,8 +11,10 @@ import { Dialog } from 'primereact/components/dialog/Dialog';
 import { PickList } from 'primereact/components/picklist/PickList';
 import { DataList } from 'primereact/components/datalist/DataList';
 
+//================IMPORT DE VARIABLES=====================
+import { comites } from './data';
 
-var itemsAgendaTMP=[];
+var itemsAgendaTMP = [];
 let es = {
     firstDayOfWeek: 1,
     dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -21,7 +23,10 @@ let es = {
     monthNames: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
     monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 };
-export class Acta extends Component {
+let aux = [];
+
+
+export class ActaQuickResponse extends Component {
 
     constructor() {
         super();
@@ -32,22 +37,33 @@ export class Acta extends Component {
             showModalParticipantes: false,
             showModalAgenda: false,
             showModalPlanes: false,
-            itemTextAgenda:'',
+            itemTextAgenda: '',
             itemsAgenda: [],
+            city: '',
+            cities:[],
+            picklistSourceCars:[],
+            picklistTargetCars:[]
 
         }
 
         this.dataListTemplate = this.dataListTemplate.bind(this);
-        this.addListItem= this.addListItem.bind(this);
+        this.addListItem = this.addListItem.bind(this);
+        this.onDropdownChange = this.onDropdownChange.bind(this);
+        this.dataListBoxCommitte = this.dataListBoxCommitte.bind(this);
+
         //this.showParticipantes=this.showParticipantes.bind(this);
     }
 
     componentDidMount() {
-       
+        debugger
+        var data2=this.dataListBoxCommitte();
+        this.setState({cities: data2});
+        var data= comites[1].employees;
+        this.setState({picklistSourceCars:data});
     }
 
     //********************===============FUNCIONES===============*************************
-    
+
     //******===== DEFINE EL TEMPLATE VIEW DE LA DATA =========== */
     dataListTemplate(car) {
 
@@ -66,24 +82,48 @@ export class Acta extends Component {
     }
 
     //**======= GUARDA LA LISTA DE ITEMS ======== */
-    addListItem(){
-        if(this.state.itemTextAgenda!=''){
-            var item={nombre: this.state.itemTextAgenda}
+    addListItem() {
+        if (this.state.itemTextAgenda != '') {
+            var item = { nombre: this.state.itemTextAgenda }
             itemsAgendaTMP.push(item);
-            this.setState({itemsAgenda: itemsAgendaTMP})
+            this.setState({ itemsAgenda: itemsAgendaTMP })
         }
+    }
+
+    onDropdownChange(event) {
+        this.setState({ city: event.value })
+        console.log("Event===>"+event.value);
+        
+    }
+
+    pickListTemplate(car) {
+        if (!car) {
+            return;
+        }
+        return <div className="ui-helper-clearfix">
+            <div style={{ fontSize: '16px', float: 'right', margin: '15px 5px 0 0' }}>{car.name}</div>
+        </div>
+    }
+
+    dataListBoxCommitte() {
+        var aux=[];
+        comites.forEach(function (element) {
+            console.log(element);
+            var item = new Object();
+            item.label = element.name;
+            item.value = element.idCommittee;
+            aux.push({ label: element.name, value: element.idCommittee })
+        });
+        return aux;
     }
 
 
     render() {
+        
         return (
             <div>
                 <div className="ui-g">
-                    <div className="ui-g-12" style={{ paddingBottom: '0' }} >
-                        <div className="card" style={{ textAlign: "center", padding: '12px' }}>
-                            <h3>SISTEMA DE GESTIÓN DE LA CALIDAD</h3>
-                        </div>
-                    </div>
+
                     <div className="ui-g-4" style={{ paddingBottom: '0' }}>
                         <div className="card" style={{ textAlign: "center", padding: '8px' }}>
                             <h3>SGQ-00</h3>
@@ -91,7 +131,7 @@ export class Acta extends Component {
                     </div>
                     <div className="ui-g-4" style={{ paddingBottom: '0' }}>
                         <div className="card" style={{ textAlign: "center", padding: '8px' }}>
-                            <h3>Referencia: Manual de Calidad MC-SGQ</h3>
+                            <h3>Reunión Respuesta Rápida</h3>
                         </div>
                     </div>
                     <div className="ui-g-4" style={{ paddingBottom: '0' }}>
@@ -136,7 +176,6 @@ export class Acta extends Component {
                                     <Button label="Terminar Reunión" />
                                 </div>
 
-
                             </div>
                         </div>
                     </div>
@@ -144,12 +183,19 @@ export class Acta extends Component {
 
                 </div>
 
-                <Dialog header="Particpantes" visible={this.state.showModalParticipantes} width="350px" modal={true} onHide={() => this.setState({ showModalParticipantes: false })}>
-                    <div className='ui-dialog-titlebar'>Participantes</div>
-                    <div className="card card-w-title">
-                        <h1>PickList</h1>
-                        <PickList source={this.state.picklistSourceCars} target={this.state.picklistTargetCars} sourceHeader="Available" targetHeader="Selected"
-                            responsive={true} itemTemplate={(car) => <span>{car.brand}</span>}
+                <Dialog header="Participantes" visible={this.state.showModalParticipantes} width="900px" modal={true} onHide={() => this.setState({ showModalParticipantes: false })}>
+                    <div className="card">
+                        <div className="ui-g form-group ui-fluid">
+                            <div className="ui-g-1">
+                                <label>Comites</label>
+                            </div>
+                            <div className="ui-g-10">
+                                <Dropdown options={this.state.cities} onChange={this.onDropdownChange} style={{ width: '300px' }} placeholder="Selecione un comite" />
+
+                            </div>
+                        </div>
+                        <PickList source={this.state.picklistSourceCars} target={this.state.picklistTargetCars} sourceHeader="Disponible" targetHeader="Selecionados"
+                            responsive={true} itemTemplate={(car) => <span>{car.name}</span>}
                             onChange={(e) => this.setState({ picklistSourceCars: e.source, picklistTargetCars: e.target })} />
                     </div>
                 </Dialog>
@@ -161,11 +207,11 @@ export class Acta extends Component {
                                 <div className="ui-g-9">
                                     <span className="ui-float-label">
                                         <label htmlFor="float-input">Item</label>
-                                        <InputText id="float-input" type="text" onChange={(e) => this.setState({itemTextAgenda: e.target.value})} />
+                                        <InputText id="float-input" type="text" onChange={(e) => this.setState({ itemTextAgenda: e.target.value })} />
                                     </span>
                                 </div>
                                 <div className="ui-g-3" >
-                                    <Button label='Añadir' className="success-btn" icon='fa fa-user-plus' style={{marginTop:'16px'}} onClick={this.addListItem}/>
+                                    <Button label='Añadir' className="success-btn" icon='fa fa-user-plus' style={{ marginTop: '16px' }} onClick={this.addListItem} />
                                 </div>
                             </div>
                             <DataList value={this.state.itemsAgenda} paginator={true} rows={3} className="cars-datalist" header="Lista de actividades"

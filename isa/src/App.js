@@ -5,7 +5,6 @@ import {AppTopbar} from './AppTopbar';
 import {AppFooter} from './AppFooter';
 import {AppMenu} from './AppMenu';
 import {Home} from './components/Home';
-import {Panels} from './components/PanelsDemo';
 import 'primereact/resources/primereact.min.css';
 import 'nanoscroller/bin/css/nanoscroller.css';
 import 'fullcalendar/dist/fullcalendar.css';
@@ -28,7 +27,8 @@ class App extends Component {
             topbarMenuActive: false,
             activeTopbarItem: null,
             darkMenu: false,
-            menuActive: false
+            menuActive: false,
+            stateLogin:false,
         };
         
         this.onDocumentClick = this.onDocumentClick.bind(this);
@@ -197,7 +197,7 @@ class App extends Component {
         this.menu = [
             {label: 'Inicio', icon: 'fa fa-fw fa-home', command: () => { window.location.hash="/"}},
             {
-                label: 'S.G.C', icon: 'fa fa-files-o', command: () => { window.location.hash="/"},
+                label: 'S.G.C', icon: 'fa fa-files-o',
                 items:[
                     {label:'Crear Acta', icon:'fa fa-plus-circle', command: () => { window.location.hash="/acta"}},
                     {label:'Pendientes', icon:'fa fa-list-ol'},
@@ -205,9 +205,9 @@ class App extends Component {
             
             },
             {
-                label: 'Respuesta Rápida', icon: 'fa fa-bolt', command: () => { window.location.hash="/"},
+                label: 'Respuesta Rápida', icon: 'fa fa-bolt',
                 items:[
-                    {label:'Crear Acta', icon:'fa fa-plus-circle'},
+                    {label:'Crear Acta', icon:'fa fa-plus-circle', command: () => { window.location.hash="/quick-response/acta"}},
                     {label:'Pendientes', icon:'fa fa-list-ol'},
                 ]
             
@@ -221,8 +221,9 @@ class App extends Component {
             
             },
             {
-                label: 'I + D', icon: 'fa fa-fw fa-magic', command: () => { window.location.hash="/"},
+                label: 'I + D', icon: 'fa fa-fw fa-magic',
                 items:[
+                    {label: 'Producto', icon:'fa fa-product-hunt', command: () => { window.location.hash="/quality-development/product"}},
                     {label:'Ensayos', icon:'fa fa-flask'},
                 ]
             
