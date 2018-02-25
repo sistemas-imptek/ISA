@@ -1,6 +1,6 @@
 
-import {encryptAES, decryptAES} from './cryptography/crypto3DESHandler';
-import {AjaxPostService} from './ajax-handler';
+import { encryptAES, decryptAES } from './cryptography/crypto3DESHandler';
+import { AjaxPostService, FetchAjax } from './ajax-handler';
 
 /* LIBRERIAS  */
 var intentosConexion = 0;
@@ -9,22 +9,33 @@ var Request;
 
 
 export function SendPostRequestToService(WebRequest, addFunction, LoadScreen, platForm) {
-   debugger;    
+    debugger;
     WebRequest.parameters = encryptAES(WebRequest.parameters);
     var isAsync = true;
-    return AjaxPostService(WebRequest, addFunction, isAsync);
+    //return AjaxPostService(WebRequest, addFunction, isAsync);
+    return FetchAjax(WebRequest, addFunction);
 
 }
 
-export function SuccessServiceCall(data, CoreRequest, addFunction) {
-    var parameters = JSON.parse(decryptAES(CoreRequest.Parameters));
-    var responseClaro = decryptAES(data);
-    var result = JSON.parse(decodeURIComponent(escape(responseClaro)));
-    if (addFunction) {
+export function SuccessServiceCall(data, MovilRequest, addFunction) {
+    debugger;
+    try {
+        var parameters = decryptAES(MovilRequest.parameters, true);
+        var responseClaro = decryptAES(data.parameters, true);
+        //var result = JSON.parse(decodeURIComponent(escape(responseClaro)));
+        if (addFunction) {
+            //$.extend(result, { esRegistro: parameters.esRegistro });
+            //var isOk = addFunction.handlerError(result);
+           // let isOK = errorHandler(responseClaro);
+            /*if (isOK) {
+                addFunction(responseClaro.ResponseElements);
+            } else {
+                addFunction(responseClaro.AditionalCoreMessage);
+            }*/
+        }
 
-        var isOk = addFunction.handlerError(result, parameters);
-        if (isOk)
-            addFunction(result.ResponseElements);
+    } catch (error) {
+        console.log(error);
     }
 }
 

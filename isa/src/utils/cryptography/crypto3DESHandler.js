@@ -81,7 +81,6 @@ var iv = CryptoJS.enc.Utf8.parse('7061737323313233');
 /*encryptAES:  funcion para encriptar la data a enviar a los sericios */
 export function encryptAES (input){
 	let encrypted;
-	debugger;
 	if(input !== null && typeof input === 'object'){
 		
 		var objectParse=JSON.stringify(input);

@@ -8,7 +8,7 @@ export function AjaxPostService(WebRequest, addFunction, isAsync, esReconexion) 
             type: "POST",
             dataType: "json",
             scriptCharset: "utf-8",
-            url: 'http://192.168.20.145:8080/minute/transactions',
+            url: 'http://192.168.20.145:8080/qualityQR/api',
             data: WebRequest,
             success: function (data) {
                 debugger;
@@ -27,6 +27,28 @@ export function AjaxPostService(WebRequest, addFunction, isAsync, esReconexion) 
     } catch (e) {
         throw e;
     }
+}
+
+export function FetchAjax(WebRequest, addFunction){
+    debugger;
+    fetch('http://192.168.20.145:8080/qualityQR/api2', 
+    {   method: 'POST',
+    
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(WebRequest)
+    })
+    .then( 
+        (response)=>{
+            return response.json();
+        }).then((wri)=>{
+        //var resp= decryptAES(responseData, true);
+        debugger;
+      SuccessServiceCall(wri,WebRequest,addFunction);
+        //return (responseData.d);  						    			
+    })
+    .catch( err => console.error(err))  
 }
 
 /*
