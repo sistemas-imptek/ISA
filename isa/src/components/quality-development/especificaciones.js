@@ -17,46 +17,22 @@ import { Card } from 'primereact/components/card/Card';
 import { tipoProducto } from '../../global/catalogs';
 
 export class Caracteristicas extends Component {
-    
-        constructor() {
-            super();
-            this.state = {};
-        }
-    
-        render() {
-            return( 
-            <div className="ui-g-12">
-            <div className="card">
-               Test
-            </div>
-                <Card>
-                    Contenido
-                    xs
-                    xsds
-                    xsxs
-                    ddd
-                    datatabled
-                    datatabled
-                </Card>
-                <Card>
-                    Contenido
-                    xs
-                    xsds
-                    xsxs
-                    ddd
-                    datatabled
-                    datatabled
-                </Card>
-                <Card>
-                    Contenido
-                    xs
-                    xsds
-                    xsxs
-                    ddd
-                    datatabled
-                    datatabled
-                </Card>
-            </div>
-            )
-        }
+
+    constructor() {
+        super();
+        this.state = {};
     }
+
+    render() {
+        return (
+            <div className="ui-g-12">
+                <Card>
+                    <div className='ui-g'>
+    
+                    </div>
+                </Card>
+
+            </div>
+        )
+    }
+}
