@@ -2,7 +2,7 @@
  import {decryptAES} from './cryptography/crypto3DESHandler';
  import $ from 'jquery';
 
-export function AjaxPostService(WebRequest, addFunction, isAsync, esReconexion) {
+/* export function AjaxPostService(WebRequest, addFunction, isAsync, esReconexion) {
     try {
         var ResponseAjaxCall = $.ajax({
             type: "POST",
@@ -27,13 +27,11 @@ export function AjaxPostService(WebRequest, addFunction, isAsync, esReconexion) 
     } catch (e) {
         throw e;
     }
-}
+} */
 
 export function FetchAjax(WebRequest, addFunction){
-    debugger;
-    fetch('http://192.168.20.145:8080/qualityQR/api2', 
+    fetch('http://localhost:8080/qualityQR/api', 
     {   method: 'POST',
-    
         headers: {
           'Content-Type': 'application/json',
         },
@@ -42,13 +40,12 @@ export function FetchAjax(WebRequest, addFunction){
     .then( 
         (response)=>{
             return response.json();
-        }).then((wri)=>{
+        }).then((wri2)=>{
         //var resp= decryptAES(responseData, true);
         debugger;
-      SuccessServiceCall(wri,WebRequest,addFunction);
+        SuccessServiceCall(wri2,WebRequest,addFunction);
         //return (responseData.d);  						    			
-    })
-    .catch( err => console.error(err))  
+    }).catch( err => console.error(err))  
 }
 
 /*

@@ -1,8 +1,8 @@
 {
     "data": [
-        {"codigo": 1, "nombre": "Alumban", "tipo": "Lámina", "codigoSAP": "PR219874"},
-        {"codigo": 2, "nombre": "Super K", "tipo": "Lámina", "codigoSAP": "PR58745"},
-        {"codigo": 3, "nombre": "Revestimiento", "tipo": "Líquido", "codigoSAP": "PR758"},
-        {"codigo": 4, "nombre": "Super Acril", "tipo": "Líquido", "codigoSAP": "PR31ff"}
+        {"codigo": 1, "nombre": "Alumban", "tipo": "Producto Terminado", "familia":"Lámina", "codigoSAP": "219874"},
+        {"codigo": 2, "nombre": "Super K", "tipo": "Producto Terminado","familia":"Lámina", "codigoSAP": "58745"},
+        {"codigo": 3, "nombre": "Revestimiento", "tipo": "Producto Terminado","familia":"Líquido", "codigoSAP": "758"},
+        {"codigo": 4, "nombre": "Super Acril", "tipo": "Materia Prima", "familia":"Líquido","codigoSAP": "31ff"}
     ]
 }

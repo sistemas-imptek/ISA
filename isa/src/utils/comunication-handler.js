@@ -20,10 +20,11 @@ export function SendPostRequestToService(WebRequest, addFunction, LoadScreen, pl
 export function SuccessServiceCall(data, MovilRequest, addFunction) {
     debugger;
     try {
-        var parameters = decryptAES(MovilRequest.parameters, true);
+        //var parameters = decryptAES(MovilRequest.parameters, true);
         var responseClaro = decryptAES(data.parameters, true);
         //var result = JSON.parse(decodeURIComponent(escape(responseClaro)));
         if (addFunction) {
+            addFunction(responseClaro)
             //$.extend(result, { esRegistro: parameters.esRegistro });
             //var isOk = addFunction.handlerError(result);
            // let isOK = errorHandler(responseClaro);

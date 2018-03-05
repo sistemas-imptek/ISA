@@ -11,7 +11,8 @@ var MD5 = require('crypto-js/md5');
 
 var TransactionsCore = {
     LoginValidate: { transactionName: 'loginValidate', transactioncode: 'TR001', parameters: { userName: '', pass: '' }, },
-    ActaSave: { transactionName: 'actaSave', transactioncode: 'TR002', parameters: {} }
+    ActaSave: { transactionName: 'actaSave', transactioncode: 'TR002', parameters: {} },
+    GetAllProperty: { transactionName: 'GetAllOnlyPL', transactionCode: 'TxQQRgetOnlyPL', parameters: {} }
 }
 
 export function loginValidate(user, password, addFunction) {
