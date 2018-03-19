@@ -23,7 +23,14 @@ export var unidadesMedida=[
     {label: 'm', value: 'm'},
     {label: 'dmm', value: 'dmm'},
     {label: 'g/ml', value: 'g/ml'},
-    {label: 'Kg', value: 'Kg'},
+    {label: 'kg', value: 'kg'},
     {label: 'Kg/m2', value: 'Kg/m2'},
-    {label: 'N/50mm', value: 'dmm'},
+    {label: 'N/50mm', value: 'N/50mm'},
+]
+
+/* Variable que contiene catalogo de Diaridad */
+export var periocidad=[
+    {label: 'Diaria', value: 'DIARIA'},
+    {label: 'Semanal', value: 'SEMANAL'},
+    {label: 'Mensual', value: 'MENSUAL'},
 ]

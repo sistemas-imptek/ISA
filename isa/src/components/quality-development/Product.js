@@ -22,10 +22,8 @@ import { data } from './data';
 import { tipoProducto, familiaProducto, unidadesMedida } from '../../global/catalogs';
 import { technicalProperty, viewProperty } from '../../global/properties';
 
-/* ======  COMPONENTS ======== */
-import { Caracteristicas } from './especificaciones';
-/* ======  TRANSACTIONS ======== */
-import { GetAllProducts, GetProductById, productSave } from '../../utils/TransactionsCalidad';
+/* ======  T R A N S A C T I O N S ======== */
+import { GetAllProducts, GetProductById, productSave, PropertyProductSave } from '../../utils/TransactionsCalidad';
 
 var DataCheck;
 var DataCheck2 = [];
@@ -34,6 +32,7 @@ var componetesCheck = [];
 var DataInput = []; //Variable para almacenar los datos modificados.
 var widgetProperty = [];// variable para guardar los componentes creados.
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
+var productoEncontrado = undefined;
 
 export class Product extends Component {
 
@@ -53,7 +52,8 @@ export class Product extends Component {
             checkboxValueVC: [],
             statePanelInfProduc: 'none',
             unidad: '',
-            productFinded:{}
+            productFinded: {},
+            reloadTextInput: false,
         };
         that = this;
         this.carservice = new CarService();
@@ -68,6 +68,7 @@ export class Product extends Component {
         this.buildForm = this.buildForm.bind(this);
         this.showPropertiesBBDD = this.showPropertiesBBDD.bind(this);
         this.searchProduct = this.searchProduct.bind(this);
+        this.updatePropertyProduct = this.updatePropertyProduct.bind(this);
     }
 
     componentDidMount() {
@@ -84,15 +85,16 @@ export class Product extends Component {
         });
     }
 
-    /* =============== FUNCIONES ============== */
+    /* =============== F U N C I O N E S ============== */
     onDropdownChangeTipoProducto(event) {
         this.setState({ tipo: event.value });
     }
     onDropdownChangeFamiliaProducto(event) {
         this.setState({ familia: event.value });
     }
-    onDropdownChangeUnidad(event) {
-        this.setState({ unidad: event.value })
+    onDropdownChangeUnidad(e, id) {
+        DataInput[id] = e.value;
+        this.setState({ reloadTextInput: true })
     }
 
     closeDialogProductoNuevo() {
@@ -119,13 +121,14 @@ export class Product extends Component {
 
         this.setState({ checkboxValueVC: selected });
     }
-
-    onWriting(id, value){
-        DataInput[id]=value;
-       this.setState({ reloadTextInput:true});
+    /* Método que captura el valor de InputText */
+    onWriting(e, id) {
+        debugger;
+        DataInput[id] = e.target.value;
+        this.setState({ reloadTextInput: true });
     }
 
-/* Métodos  Auto Completado */
+    /* Métodos  Auto Completado */
     handleDropdownClick() {
         this.setState({ filteredBrands: [] });
         //mimic remote call
@@ -142,11 +145,10 @@ export class Product extends Component {
     onProductValueChange(e) {
         this.setState({ product: e.value, filteredProducts: null });
     }
-/* FIn Métodos  Auto Completado */
+    /* FIn Métodos  Auto Completado */
 
     /* Método para guardar un producto */
     saveProducto() {
-        console.log(this.state.tipo + " " + this.state.nombre + " " + this.state.descripcion + " " + this.state.codigo);
         var newIten = { codigo: "", tipo: "", nombre: "", codigoSAP: "" };
         newIten.codigo = 5;
         newIten.tipo = this.state.tipo;
@@ -172,9 +174,42 @@ export class Product extends Component {
         GetProductById(result.idProduct, function (product) {
             console.log(product);
             that.buildForm(product);
-            that.setState({productFinded:product, statePanelInfProduc:'' });
+            productoEncontrado = product;
+            that.setState({ productFinded: product, statePanelInfProduc: '' });
         });
     }
+    /* Método para modificar propiedades de un Producto  */
+    updatePropertyProduct() {
+        var productTMP = this.state.productFinded;
+        Object.keys(DataInput).map(function (key1) {
+            var res = key1.split('.');
+            productTMP.propertyList.map(function (value, index) {
+                if (value.idProperty === res[0]) {
+                    switch (res[1]) {
+                        case 'valueMin':
+                            value.minProperty = DataInput[key1];
+                            break;
+                        case 'valueMax':
+                            value.maxProperty = DataInput[key1];
+                            break;
+                        case 'unit':
+                            value.unitProperty = DataInput[key1];
+                            break;
+                        default:
+                            value.viewProperty=DataInput[key1];
+                            break;
+                    }
+                }
+            })
+        })
+        debugger;
+        PropertyProductSave(productTMP, function(respuesta){
+            debugger;
+            
+        });
+
+    }
+
     /* Método para crear componentes  dinamicamente */
     showListProperties(familyType) {
         switch (familyType) {
@@ -198,40 +233,68 @@ export class Product extends Component {
         )
     }
 
-    renderProperty(id, namePorperty, valueMin, valueMax, unit) {
-        DataInput[id] = '';
-        return (
-            <div>
-                <Card>
-                    <div className='ui-g ui-fluid'>
-                        <div className='ui-g-12'>
-                            <strong>{namePorperty}</strong>
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Valor Mínimo</label>
-                            <InputText id={'vmin' + id} type="text" onChange={(e) => this.onWriting({e,id })} value={valueMin} />
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Valor Máximo</label>
-                            <InputText id={'vmax' + id} type="text" onChange={(e) => this.setState({ nombre: e.target.value })} value={valueMax} />
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Unidad</label>
-                            <Dropdown id={'u' + id} options={unidadesMedida} value={unit} onChange={this.onDropdownChangeUnidad} autoWidth={false} placeholder="Selecione" />
-                        </div>
+    renderProperty(id, namePorperty, valueMin, valueMax, unit, valueView, type) {
+        switch (type) {
+            case 'T':
+                if (this.state.reloadTextInput != true) {
+                    DataInput[id + ".valueMin"] = valueMin;
+                    DataInput[id + ".valueMax"] = valueMax;
+                    DataInput[id + ".unit"] = unit;
+                }
+                return (
+                    <div className='ui-g-6'>
+                        <Card>
+                            <div className='ui-g ui-fluid'>
+                                <div className='ui-g-12'>
+                                    <strong>{namePorperty}</strong>
+                                </div>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">Valor Mínimo</label>
+                                    <InputText id={'vmin' + id} type="text" onChange={(e) => this.onWriting(e, id + ".valueMin")} value={DataInput[id + ".valueMin"]} />
+                                </div>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">Valor Máximo</label>
+                                    <InputText id={'vmax' + id} type="text" onChange={(e) => this.onWriting(e, id + ".valueMax")} value={DataInput[id + ".valueMax"]} />
+                                </div>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">Unidad</label>
+                                    <Dropdown id={'u' + id} options={unidadesMedida} value={DataInput[id + '.unit']} onChange={(e) => this.onDropdownChangeUnidad(e, id + ".unit")} autoWidth={false} placeholder="Selecione" />
+                                </div>
+                            </div>
+                        </Card>
                     </div>
-                </Card>
-            </div>
-        )
+                )
+                break;
+            case 'V':
+                if (this.state.reloadTextInput != true) {
+                    DataInput[id] = valueView;
+                }
+                return (
+                    <div className='ui-g-6'>
+                        <Card>
+                            <div className='ui-g ui-fluid'>
+                                <div className='ui-g-12'>
+                                    <strong>{namePorperty}</strong>
+                                </div>
+                                <div className='ui-g-12'>
+                                    <InputText id={id} type="text" onChange={(e) => this.onWriting(e, id)} value={DataInput[id]} />
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+                )
+                break;
+        }
+
+
     }
     /* FUNCIÓN QUE PERMITE CREAR EL FORMULARIO EN BASE A CARACTERITICAS */
     buildForm(product) {
         debugger;
         console.log('ingreso')
         product.propertyList.map(function (value, index) {
-            widgetProperty.push(that.renderProperty('index' + value.idProperty, value.nameProperty, value.minProperty, value.maxProperty, value.unitProperty));
+            widgetProperty.push(that.renderProperty(value.idProperty, value.nameProperty, value.minProperty, value.maxProperty, value.unitProperty, value.viewProperty, value.typeProperty));
         })
-        this.setState({ showModalCaraterísticas: false })
     }
     /* FUNCIÓN QUE MUESTRA LAS PROPIEDADES INGRESADAS DE LA BBDD */
     showPropertiesBBDD() {
@@ -252,6 +315,10 @@ export class Product extends Component {
 
     render() {
         //this.showPropertiesBBDD();
+        if (productoEncontrado !== undefined) {
+            widgetProperty = [];
+            this.buildForm(this.state.productFinded);
+        }
         var header = <div style={{ 'textAlign': 'left' }}>
             <Toolbar>
                 <div className="ui-toolbar-group-left">
@@ -285,7 +352,7 @@ export class Product extends Component {
                                 <div className='ui-g form-group ui-fluid' style={{ alignItems: 'center' }}>
                                     <div className='ui-g-8'>
                                         <div className="ui-inputgroup">
-                                            <AutoComplete minLength={1} placeholder="Buscar por nombre de producto" id="acAdvanced" 
+                                            <AutoComplete minLength={1} placeholder="Buscar por nombre de producto" id="acAdvanced"
                                                 suggestions={this.state.filteredProducts} completeMethod={this.filterProducts.bind(this)} value={this.state.product}
                                                 onChange={this.onProductValueChange.bind(this)} onDropdownClick={this.handleDropdownClick.bind(this)}
                                             />
@@ -311,7 +378,22 @@ export class Product extends Component {
                                         </div>
                                     </div>
                                 </Card>
-                                {widgetProperty}
+                                <Card style={{ display: this.state.statePanelInfProduc }}>
+                                    <div className='ui-g'>
+                                        {widgetProperty}
+                                    </div>
+                                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                                        <div className='ui-g-4'>
+                                            <Button label='Aceptar' icon="fa fa-check" onClick={this.updatePropertyProduct} />
+                                        </div>
+                                        <div className='ui-g-4'>
+                                            <Button className="ui-button-danger" label='Cancelar' icon="fa fa-close" />
+                                        </div>
+
+                                    </div>
+
+                                </Card>
+
 
                             </TabPanel>
                             <TabPanel header="Consultar" leftIcon="fa-eye">
