@@ -30,7 +30,14 @@ export var unidadesMedida=[
 
 /* Variable que contiene catalogo de Diaridad */
 export var periocidad=[
-    {label: 'Diaria', value: 'DIARIA'},
-    {label: 'Semanal', value: 'SEMANAL'},
-    {label: 'Mensual', value: 'MENSUAL'},
+    {label: 'Diaria', value: 'Diaria'},
+    {label: 'Mensual', value: 'Mensual'},
+    {label: 'Semestral', value: 'Semestral'},
+]
+
+/* Variable que contiene catalogo de Proveedores */
+export var proveedoresMP=[
+    {label: 'General Polymers', value: 'General Polymers'},
+    {label: 'Plasticsacks', value: 'Plasticsacks'},
+    {label: 'PlastiCaucho', value: 'PlastiCaucho'},
 ]

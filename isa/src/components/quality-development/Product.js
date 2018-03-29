@@ -75,6 +75,7 @@ export class Product extends Component {
         //this.carservice.getCarsSmall().then(data => this.setState({ cars: data }));
     }
     componentWillMount() {
+        nameProducts=[];
         GetAllProducts(function (items) {
             debugger;
             items.map(function (value, index) {
@@ -394,10 +395,6 @@ export class Product extends Component {
 
                                 </Card>
 
-
-                            </TabPanel>
-                            <TabPanel header="Consultar" leftIcon="fa-eye">
-                                After a break of more than  15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate.
                             </TabPanel>
                         </TabView>
                     </div>

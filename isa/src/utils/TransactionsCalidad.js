@@ -15,7 +15,7 @@ var Transactions = {
     GetProductByID: { transactionName: "GetProductById", transactionCode: "TxQQRgetProductById", parameters: { "idProduct": '' } },
     ProductSave: { transactionName: 'PRODUCTSAVE', transactionCode: 'TxQQRsetProduct', parameters: { typeProduct: '', itcdq: 'IT-CDQ-03.12', nameProduct: '', sapCode: '', descProduct: '' } },
     PropertyProductSave: { transactionName: "SetProduct", transactionCode: "TxQQRsetProduct", parameters: {} },
-    GenerateHCC: { transactionName: 'GenerateHcc', transactionCode: 'TxQQRgenerateHCC', parameters: { product: { idProduct: '' }, hcchBatch: '' } },
+    GenerateHCC: { transactionName: 'GenerateHcc', transactionCode: 'TxQQRgenerateHCC', parameters: { product: { idProduct: '' }, hcchBatch: '', periodicity:'' } },
     HCCSave: { transactionName: "Create/UpdateHcc", transactionCode: "TxQQRsetHCC", parameters: {} },
     ObtenerDataProducto: {}
 }
@@ -62,11 +62,12 @@ export function PropertyProductSave(product, addFunction) {
 
 }
 
-export function GenerateHCC(idProduct, hccBatch, addFunction) {
+export function GenerateHCC(idProduct, hccBatch,periodicity, addFunction) {
     debugger;
     var transaction = Transactions.GenerateHCC;
-    transaction.parameters = { product: { idProduct: '' }, hcchBatch: '' };
+    transaction.parameters = { product: { idProduct: '' }, hcchBatch: '', periodicity:'' };
     transaction.parameters.product.idProduct = idProduct;
     transaction.parameters.hcchBatch = hccBatch;
+    transaction.parameters.periodicity=periodicity;
     SendPostRequestToService(transaction, addFunction);
 }
