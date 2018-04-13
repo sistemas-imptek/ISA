@@ -9,6 +9,7 @@ import {loginValidate} from '../../utils/Transactions';
   import {ActaQuickResponse} from '../quick-response/Acta';
   import {Product} from '../quality-development/Product';
   import {HCC} from '../quality-development/Hcc';
+  import {ProductoNoConforme} from '../quality-development/Pnc'
   import {Documentation} from '../Documentation';
   import {Router,Route,hashHistory} from 'react-router';
 
@@ -122,6 +123,7 @@ export class Login extends Component {
                         <Route path="/quick-response/acta" component={ActaQuickResponse} />
                         <Route path="/quality-development/product" component={Product} />
                         <Route path="/quality-development/hcc" component={HCC} />
+                        <Route path="/quality-development/pnc" component={ProductoNoConforme} />
                     </Route>
                 </Router>,
 

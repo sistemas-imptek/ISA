@@ -18,16 +18,21 @@ import { Growl } from 'primereact/components/growl/Growl';
 
 
 /* ============  D A T A    C A T A L O G O  S =============== */
-import { periocidad, tipoProducto, proveedoresMP } from '../../global/catalogs';
+import { periocidad, tipoProducto } from '../../global/catalogs';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { GetAllProducts, GetProductById, GenerateHCC } from '../../utils/TransactionsCalidad';
+import { GetAllProducts, GetProductById, GenerateHCC, HCCSave } from '../../utils/TransactionsCalidad';
+
+/* ====================  T R A N S A C T I O N S ======== */
+import {formattedDate} from '../../utils/FormatDate';
 
 
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
 var that;
-var DataResult = [];
-var DataResultCumple = [];
+var DataResult = {};
+var DataResultCumple = {};
+var proveedoresMP= [];
+
 export class HCC extends Component {
 
     constructor() {
@@ -39,8 +44,8 @@ export class HCC extends Component {
             pnlCabeceraPT: 'none',
             specificationPanel: 'none',
             specificationList: 'none',
-            resultsPanel:'none',
-            btnGuardarHCC:'none',
+            resultsPanel: 'none',
+            btnGuardarHCC: 'none',
             hCC: {},
             frecuencia: '',
             tipo: '',
@@ -49,7 +54,7 @@ export class HCC extends Component {
             orderNumber: '',
             checked1: false,
             enabledFrecuencia: true,
-            receptDate: '',
+            receptDate: undefined,
             proveedor: '',
             analysis: '',
             observation: '',
@@ -63,6 +68,7 @@ export class HCC extends Component {
         this.onChangeBasic = this.onChangeBasic.bind(this);
         this.showError = this.showError.bind(this);
         this.showSuccess = this.showSuccess.bind(this);
+        this.saveHCC = this.saveHCC.bind(this);
     }
 
     /* =============== I N I C I O   F U N C I O N E S ======================= */
@@ -89,7 +95,7 @@ export class HCC extends Component {
                     if (obj.typeProduct == 'PT') {
                         that.setState({ enabledFrecuencia: false });
                     }
-                    if(obj.typeProduct == 'MP'){
+                    if (obj.typeProduct == 'MP') {
                         that.setState({ enabledFrecuencia: true });
                     }
                 }
@@ -136,10 +142,18 @@ export class HCC extends Component {
             });
             GenerateHCC(result.idProduct, this.state.lote, this.state.frecuencia, function (item) {
                 console.log(item);
+                
                 if (item.product.typeProduct == 'PT') {
-                    that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP:'none', specificationPanel:'',specificationList:'',btnGuardarHCC:'', resultsPanel:'' })
+                    that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
                 } else {
-                    that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT:'none', specificationList:'',specificationList:'',btnGuardarHCC:'', resultsPanel:'' })
+                    item.product.providers.map(function(obj,index){
+                        var objAux={label: '', value:''};
+                        objAux.label= obj.nameProvider;
+                        objAux.value= obj.idProvider;
+                        proveedoresMP.push(objAux);
+                    })
+                    that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
+
                 }
 
             })
@@ -165,7 +179,6 @@ export class HCC extends Component {
             DataResult[prop.idProperty] = prop.result;
             DataResultCumple[prop.idProperty] = prop.passTest;
         }
-
         if (!prop) {
             return;
         }
@@ -188,6 +201,58 @@ export class HCC extends Component {
                 </div>
             </div>
         );
+    }
+    /* Método para guardar HCC Final y Genera archivo */
+    saveHCC() {
+        console.log(DataResult);
+        console.log(DataResultCumple);
+        console.log(this.state.hCC);
+        debugger;
+        var detailAUX = [];
+        if (this.state.hCC.detail.length == Object.keys(DataResult).length) {
+            this.state.hCC.detail.map(function (item, index) {
+                switch (item.typeProperty) {
+                    case 'T':
+                        item.result = DataResult[item.idProperty];
+                        item.passTest = DataResultCumple[item.idProperty];
+                        break;
+                    case 'V':
+                        item.resultText = DataResult[item.idProperty];
+                        item.passTest = DataResultCumple[item.idProperty];
+                        break;
+                }
+                detailAUX.push(item);
+            })
+            if(this.state.hCC.product.typeProduct== 'PT'){
+                this.state.hCC.sapCode=this.state.hccPT;
+            }else{
+                this.state.hCC.sapCode=this.state.hccMP;
+                this.state.hCC.of=this.state.proveedor;
+                var nameProviderTMP=undefined;
+                this.state.hCC.product.providers.map(function(obj){
+                    if(that.state.proveedor== obj.idProvider){
+                        nameProviderTMP=obj.nameProvider;
+                    }
+                });
+                this.state.hCC.hccNorm = nameProviderTMP;
+                this.state.hCC.orderNumber= this.state.orderNumber;
+                this.state.hCC.dateOrder  = formattedDate(this.state.receptDate);
+            }
+            this.state.hCC.detail=detailAUX;
+            this.state.hCC.comment=this.state.observation;
+            this.state.hCC.analysis=this.state.analysis;
+            this.state.hCC.asUser='oquimbiulco';
+           
+
+            console.log(this.state.hCC);
+            HCCSave(this.state.hCC,function(data){
+                console.log(data);
+            })
+
+        } else {
+            this.showError();
+        }
+
     }
 
 
@@ -216,7 +281,7 @@ export class HCC extends Component {
             <div>
 
                 <Growl ref={(el) => this.growl = el} />
-                <Button label='Guardar' icon='fa fa-save' style={{
+                <Button label='Guardar' icon='fa fa-save' onClick={this.saveHCC} style={{
                     display: this.state.btnGuardarHCC,
                     position: 'fixed',
                     float: 'right',
@@ -278,10 +343,10 @@ export class HCC extends Component {
                         </div>
                     </div>
                 </Card>
-                <Card style={{ display: this.state.pnlCabeceraMP }}>
+                <Card style={{ display: this.state.pnlCabeceraMP, borderColor: '#d4e157', borderBottomWidth: 5 }}>
                     <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
-                        <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px' }}>
-                            <h3>LABORATORIO DE INSPECCIÓN Y ENSAYO MATERIAS PRIMAS</h3>
+                        <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', backgroundColor: '#457fca', borderRadius: 5 }}>
+                            <h3 style={{ color: '#ffff' }}>LABORATORIO DE INSPECCIÓN Y ENSAYO MATERIAS PRIMAS</h3>
                         </div>
                         <div className='ui-g-3'>
                             <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
@@ -297,7 +362,7 @@ export class HCC extends Component {
                         </div>
                         <div className='ui-g-3'>
                             <label htmlFor="float-input">Fecha Recepción</label>
-                            <Calendar value={this.state.receptDate} locale={es} showIcon="true" onChange={(e) => this.setState({ receptDate: e.value })}></Calendar>
+                            <Calendar dateFormat="yy/mm/dd" value={this.state.receptDate} locale={es} showIcon="true" onChange={(e) => this.setState({ receptDate: e.value })}></Calendar>
                         </div>
                         <div className='ui-g-3'>
                             <label htmlFor="float-input">Pedido</label>

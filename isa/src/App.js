@@ -224,13 +224,13 @@ class App extends Component {
                 label: 'I + D', icon: 'fa fa-fw fa-magic',
                 items:[
                     {label: 'Producto', icon:'fa fa-product-hunt', command: () => { window.location.hash="/quality-development/product"}},
-                    {label:'Ensayos', icon:'fa fa-flask'},
+                    /* {label:'Ensayos', icon:'fa fa-flask'}, */
                     {label: 'HCC', icon:'fa fa-copy', command: () => { window.location.hash="/quality-development/hcc"}},
+                    {label: 'PNC', icon:'fa fa-edit', command: () => { window.location.hash="/quality-development/pnc"}},
                 ]
             
             },
             
-            {label: 'Documentation', icon: 'fa fa-fw fa-book', command: () => { window.location.hash="/documentation"; }}
         ];
     }
 

@@ -71,3 +71,10 @@ export function GenerateHCC(idProduct, hccBatch,periodicity, addFunction) {
     transaction.parameters.periodicity=periodicity;
     SendPostRequestToService(transaction, addFunction);
 }
+
+export function HCCSave(hcc, addFunction){
+    var transaction = Transactions.HCCSave;
+    transaction.parameters={};
+    transaction.parameters=hcc;
+    SendPostRequestToService(transaction,addFunction);
+}
