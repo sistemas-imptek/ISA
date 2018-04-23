@@ -15,9 +15,10 @@ var Transactions = {
     GetProductByID: { transactionName: "GetProductById", transactionCode: "TxQQRgetProductById", parameters: { "idProduct": '' } },
     ProductSave: { transactionName: 'PRODUCTSAVE', transactionCode: 'TxQQRsetProduct', parameters: { typeProduct: '', itcdq: 'IT-CDQ-03.12', nameProduct: '', sapCode: '', descProduct: '' } },
     PropertyProductSave: { transactionName: "SetProduct", transactionCode: "TxQQRsetProduct", parameters: {} },
-    GenerateHCC: { transactionName: 'GenerateHcc', transactionCode: 'TxQQRgenerateHCC', parameters: { product: { idProduct: '' }, hcchBatch: '', periodicity:'' } },
+    GenerateHCC: { transactionName: 'GenerateHcc', transactionCode: 'TxQQRgenerateHCC', parameters: { product: { idProduct: '' }, hcchBatch: '', periodicity: '' } },
     HCCSave: { transactionName: "Create/UpdateHcc", transactionCode: "TxQQRsetHCC", parameters: {} },
-    ObtenerDataProducto: {}
+    ObtenerDataProducto: {},
+    GetCatalogsPNC: { transactionName: "Request", transactionCode: "TxRNCP", parameters: "" },
 }
 
 export function productSave(producto, addFunction) {
@@ -59,22 +60,27 @@ export function PropertyProductSave(product, addFunction) {
     transaction.parameters = {};
     transaction.parameters = product;
     SendPostRequestToService(transaction, addFunction);
-
 }
 
-export function GenerateHCC(idProduct, hccBatch,periodicity, addFunction) {
+export function GenerateHCC(idProduct, hccBatch, periodicity, addFunction) {
     debugger;
     var transaction = Transactions.GenerateHCC;
-    transaction.parameters = { product: { idProduct: '' }, hcchBatch: '', periodicity:'' };
+    transaction.parameters = { product: { idProduct: '' }, hcchBatch: '', periodicity: '' };
     transaction.parameters.product.idProduct = idProduct;
     transaction.parameters.hcchBatch = hccBatch;
-    transaction.parameters.periodicity=periodicity;
+    transaction.parameters.periodicity = periodicity;
     SendPostRequestToService(transaction, addFunction);
 }
 
-export function HCCSave(hcc, addFunction){
+export function HCCSave(hcc, addFunction) {
     var transaction = Transactions.HCCSave;
-    transaction.parameters={};
-    transaction.parameters=hcc;
-    SendPostRequestToService(transaction,addFunction);
+    transaction.parameters = {};
+    transaction.parameters = hcc;
+    SendPostRequestToService(transaction, addFunction);
+}
+
+export function GetCatalogsPNC(addFunction) {
+    debugger;
+    var transaction = Transactions.GetCatalogsPNC;
+    SendPostRequestToService(transaction, addFunction);
 }

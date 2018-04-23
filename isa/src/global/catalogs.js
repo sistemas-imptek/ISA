@@ -21,11 +21,15 @@ export var unidadesMedida=[
     {label: 'mm', value: 'mm'},
     {label: 'cm', value: 'cm'},
     {label: 'm', value: 'm'},
+    {label: 'm2', value: 'm2'},
     {label: 'dmm', value: 'dmm'},
+    {label: 'gal', value: 'gal'},
     {label: 'g/ml', value: 'g/ml'},
     {label: 'kg', value: 'kg'},
     {label: 'Kg/m2', value: 'Kg/m2'},
     {label: 'N/50mm', value: 'N/50mm'},
+    {label: 'Rollo', value: 'Rollo'},
+    {label: 'unidad', value: 'u'},
 ]
 
 /* Variable que contiene catalogo de Diaridad */
@@ -41,3 +45,22 @@ export var proveedoresMP=[
     {label: 'Plasticsacks', value: 'Plasticsacks'},
     {label: 'PlastiCaucho', value: 'PlastiCaucho'},
 ]
+
+/* Variable que contiene catalogo de Prcedencias */
+export var procedencia=[
+    {label: 'Producto Terminado', value: 'PT'},
+    {label: 'Materia Prima', value: 'MP'},
+    {label: 'Producto en Proceso', value: 'PP'},
+    {label: 'Externo', value: 'EX'},
+]
+
+/* Variable que contiene el catalogo de las 5M's */
+export var cincoMs=[
+    {label: 'Mano de Obra', value: 'Mano de Obra'},
+    {label: 'Materia Prima', value: 'Materia Prima'},
+    {label: 'Método', value: 'Método'},
+    {label: 'Medio Ambiente', value: 'Medio Ambiente'},
+    {label: 'Maquiaria', value: 'Maquinaria'},
+    {label: 'Otro', value: 'Otro'},
+]
+

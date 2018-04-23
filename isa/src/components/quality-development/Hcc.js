@@ -23,7 +23,7 @@ import { periocidad, tipoProducto } from '../../global/catalogs';
 /* ====================  T R A N S A C T I O N S ======== */
 import { GetAllProducts, GetProductById, GenerateHCC, HCCSave } from '../../utils/TransactionsCalidad';
 
-/* ====================  T R A N S A C T I O N S ======== */
+/* ====================  U T I L S  ======== */
 import {formattedDate} from '../../utils/FormatDate';
 
 
