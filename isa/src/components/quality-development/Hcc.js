@@ -21,17 +21,17 @@ import { Growl } from 'primereact/components/growl/Growl';
 import { periocidad, tipoProducto } from '../../global/catalogs';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { GetAllProducts, GetProductById, GenerateHCC, HCCSave } from '../../utils/TransactionsCalidad';
+import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate } from '../../utils/TransactionsCalidad';
 
 /* ====================  U T I L S  ======== */
-import {formattedDate} from '../../utils/FormatDate';
+import { formattedDate } from '../../utils/FormatDate';
 
 
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
 var that;
 var DataResult = {};
 var DataResultCumple = {};
-var proveedoresMP= [];
+var proveedoresMP = [];
 
 export class HCC extends Component {
 
@@ -58,6 +58,12 @@ export class HCC extends Component {
             proveedor: '',
             analysis: '',
             observation: '',
+            hccFiles: [],
+            selectedHCC: undefined,
+            dialogCertificate: false,
+            cliente: undefined,
+            email: 'svillacis@imptek.com',
+            order: undefined
 
         };
         that = this;
@@ -69,6 +75,10 @@ export class HCC extends Component {
         this.showError = this.showError.bind(this);
         this.showSuccess = this.showSuccess.bind(this);
         this.saveHCC = this.saveHCC.bind(this);
+        this.setData = this.setData.bind(this);
+        this.actionTemplate = this.actionTemplate.bind(this);
+        this.showDialogCertifiacte = this.showDialogCertifiacte.bind(this);
+        this.generateCertificate = this.generateCertificate.bind(this);
     }
 
     /* =============== I N I C I O   F U N C I O N E S ======================= */
@@ -106,11 +116,11 @@ export class HCC extends Component {
     /* FIn Métodos  Auto Completado */
 
     /* Mostrar Mensajes */
-    showError() {
-        this.growl.show({ severity: 'error', summary: 'Error', detail: 'Ingrese el nombre del producto' });
+    showError(message) {
+        this.growl.show({ severity: 'error', summary: 'Error', detail: message });
     }
-    showSuccess() {
-        let msg = { severity: 'success', summary: 'Success Message', detail: 'Order submitted' };
+    showSuccess(message) {
+        let msg = { severity: 'success', summary: 'Success Message', detail: message };
         this.growl.show(msg);
     }
 
@@ -142,14 +152,15 @@ export class HCC extends Component {
             });
             GenerateHCC(result.idProduct, this.state.lote, this.state.frecuencia, function (item) {
                 console.log(item);
-                
+                that.setData(item.detail);
+                console.log(DataResult);
                 if (item.product.typeProduct == 'PT') {
                     that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
                 } else {
-                    item.product.providers.map(function(obj,index){
-                        var objAux={label: '', value:''};
-                        objAux.label= obj.nameProvider;
-                        objAux.value= obj.idProvider;
+                    item.product.providers.map(function (obj, index) {
+                        var objAux = { label: '', value: '' };
+                        objAux.label = obj.nameProvider;
+                        objAux.value = obj.idProvider;
                         proveedoresMP.push(objAux);
                     })
                     that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
@@ -161,8 +172,20 @@ export class HCC extends Component {
 
             this.showError();
         }
-
-
+    }
+    setData(data) {
+        data.map(function (item, index) {
+            switch (item.typeProperty) {
+                case 'V':
+                    DataResult[item.idProperty] = item.resultText;
+                    DataResultCumple[item.idProperty] = item.passTest;
+                    break;
+                case 'T':
+                    DataResult[item.idProperty] = item.result;
+                    DataResultCumple[item.idProperty] = item.passTest;
+                    break;
+            }
+        })
     }
 
     /* Método que captura el valor de InputText */
@@ -172,10 +195,23 @@ export class HCC extends Component {
         this.setState({ reloadTextInput: true });
     }
 
+    /* Template para accion en Tabla HCC */
+    actionTemplate(rowData, column) {
+        return <div>
+            <Button label='Certificado' type="button" icon='fa-print' className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+        </div>;
+    }
+    showDialogCertifiacte(data) {
+        this.setState({
+            dialogCertificate: true, selectedHCC: data
+        })
+    }
+
 
     /* Template itemList */
     propertyTemplate(prop) {
         if (this.state.reloadTextInput == false) {
+            console.log(prop)
             DataResult[prop.idProperty] = prop.result;
             DataResultCumple[prop.idProperty] = prop.passTest;
         }
@@ -204,9 +240,6 @@ export class HCC extends Component {
     }
     /* Método para guardar HCC Final y Genera archivo */
     saveHCC() {
-        console.log(DataResult);
-        console.log(DataResultCumple);
-        console.log(this.state.hCC);
         debugger;
         var detailAUX = [];
         if (this.state.hCC.detail.length == Object.keys(DataResult).length) {
@@ -223,35 +256,72 @@ export class HCC extends Component {
                 }
                 detailAUX.push(item);
             })
-            if(this.state.hCC.product.typeProduct== 'PT'){
-                this.state.hCC.sapCode=this.state.hccPT;
-            }else{
-                this.state.hCC.sapCode=this.state.hccMP;
-                this.state.hCC.of=this.state.proveedor;
-                var nameProviderTMP=undefined;
-                this.state.hCC.product.providers.map(function(obj){
-                    if(that.state.proveedor== obj.idProvider){
-                        nameProviderTMP=obj.nameProvider;
+            if (this.state.hCC.product.typeProduct == 'PT') {
+                this.state.hCC.sapCode = this.state.hccPT;
+            } else {
+                this.state.hCC.sapCode = this.state.hccMP;
+                this.state.hCC.of = this.state.proveedor;
+                var nameProviderTMP = undefined;
+                this.state.hCC.product.providers.map(function (obj) {
+                    if (that.state.proveedor == obj.idProvider) {
+                        nameProviderTMP = obj.nameProvider;
                     }
                 });
                 this.state.hCC.hccNorm = nameProviderTMP;
-                this.state.hCC.orderNumber= this.state.orderNumber;
-                this.state.hCC.dateOrder  = formattedDate(this.state.receptDate);
+                this.state.hCC.orderNumber = this.state.orderNumber;
+                this.state.hCC.dateOrder = formattedDate(this.state.receptDate);
             }
-            this.state.hCC.detail=detailAUX;
-            this.state.hCC.comment=this.state.observation;
-            this.state.hCC.analysis=this.state.analysis;
-            this.state.hCC.asUser='oquimbiulco';
-           
-
+            this.state.hCC.detail = detailAUX;
+            this.state.hCC.comment = this.state.observation;
+            this.state.hCC.analysis = this.state.analysis;
+            this.state.hCC.asUser = 'oquimbiulco';
             console.log(this.state.hCC);
-            HCCSave(this.state.hCC,function(data){
-                console.log(data);
+            HCCSave(this.state.hCC, function (data) {
+                switch (data.status) {
+                    case 'OK':
+                        that.showSuccess(data.message);
+                        DataResult = {};
+                        DataResultCumple = {};
+                        that.setState({
+                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none',
+                            resultsPanel: 'none',
+                            btnGuardarHCC: 'none',
+                            productName: '',
+                            lote: '',
+                        });
+
+                        break;
+                    case 'ERROR':
+                        that.showError(data.message);
+                        break;
+                }
             })
 
         } else {
             this.showError();
         }
+    }
+
+    /* Metodo para generar Certificado */
+    generateCertificate() {
+        var objAux = { client: '', order: '', hccSapCode: '', email: '' };
+        objAux.client = this.state.cliente;
+        objAux.hccSapCode = this.state.selectedHCC.sapCode;
+        objAux.email = this.state.email;
+        objAux.order = this.state.order;
+        GenerateCertificate(objAux, function(data){
+            switch (data.status) {
+                case 'OK':
+                    that.showSuccess(data.message);
+                    that.setState({
+                        dialogCertificate: false, cliente:'', order:'', 
+                    });
+                    break;
+                case 'ERROR':
+                    that.showError(data.message);
+                    break;
+            }
+        })
 
     }
 
@@ -261,12 +331,18 @@ export class HCC extends Component {
 
     componentWillMount() {
         nameProducts = [];
+        var hccsFiles = [];
         GetAllProducts(function (items) {
             items.map(function (value, index) {
                 nameProducts.push(value.nameProduct);
             })
             that.setState({ products: items })
         });
+        GetAllHCCs(function (items) {
+            console.log(items)
+            hccsFiles = items;
+            that.setState({ hccFiles: items })
+        })
     }
     render() {
         let es = {
@@ -277,6 +353,14 @@ export class HCC extends Component {
             monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
             monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
         };
+        var header = <div style={{ 'textAlign': 'right' }}>
+            <i className="fa fa-search" style={{ margin: '4px 4px 0 0' }}></i>
+            <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Buscar" size="35" />
+        </div>
+        let dialogFooter = <div className="ui-dialog-buttonpane ui-helper-clearfix">
+            <Button className='ui-button-danger' icon="fa fa-close" label="Cancelar" onClick={() => this.setState({ dialogCertificate: false })} />
+            <Button className='ui-button-success' label="Aceptar" icon="fa-check" onClick={this.generateCertificate} />
+        </div>;
         return (
             <div>
 
@@ -293,120 +377,155 @@ export class HCC extends Component {
                     shadow: '0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)',
                     zIndex: 100,
                 }} />
-                <Card style={{ backgroundColor: '#d4e157' }}>
-                    <div className='ui-g form-group ui-fluid'>
-                        <div className='ui-g-4'>
-                            <label htmlFor="float-input">Buscar Producto</label>
-                            <AutoComplete minLength={1} placeholder="Buscar por nombre de producto" id="acAdvanced"
-                                suggestions={this.state.filteredProducts} completeMethod={this.filterProducts.bind(this)} value={this.state.productName}
-                                onChange={this.onProductValueChange.bind(this)} onDropdownClick={this.handleDropdownClick.bind(this)}
-                            />
-                        </div>
-                        <div className='ui-g-2'>
-                            <label htmlFor="float-input">Frecuencia</label>
-                            <Dropdown disabled={this.state.enabledFrecuencia} options={periocidad} value={this.state.frecuencia} onChange={this.onDropdownChangeFrecuencia} autoWidth={false} placeholder="Selecione" />
-                        </div>
-                        <div className='ui-g-2'>
-                            <label htmlFor="float-input">Lote</label>
-                            <InputText placeholder='Lote' keyfilter="int" onChange={(e) => this.setState({ lote: e.target.value })} value={this.state.lote} />
-                        </div>
-                        <div className='ui-g-2' style={{ marginTop: '23px' }}>
-                            <Button label='Generar HCC' onClick={this.generateHCC} />
-                        </div>
 
-                    </div>
-                </Card>
-                <Card style={{ display: this.state.pnlCabeceraPT, borderColor: '#d4e157', borderBottomWidth: 5 }}>
-                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
-                        <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', backgroundColor: '#457fca', borderRadius: 5 }}>
-                            <h3 style={{ color: '#ffff' }}>LABORATORIO DE INSPECCIÓN Y ENSAYO PRODUCTO TERMINADO</h3>
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>NORMA:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.hccNorm}
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>REVISIÓN:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.review}
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>O/F:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.of}
-                        </div>
+                <TabView style={{ marginBottom: '10px' }}>
 
-                    </div>
-                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                    <TabPanel header="Consultar HCC" leftIcon="fa fa-product-hunt">
+                        <DataTable value={this.state.hccFiles} paginator={true} rows={15} header={header} globalFilter={this.state.globalFilter}>
+                            <Column field="sapCode" header="HCC" style={{ width: '10%' }} />
+                            <Column field="hcchBatch" header="Lote" style={{ width: '10%' }} />
+                            <Column field="product.nameProduct" header="Producto" style={{ width: '25%' }} />
+                            <Column field="dateCreate" header="Fecha" style={{ width: '10%' }} />
+                            <Column field="analysis" header="Análisis" style={{ width: '35%' }} />
+                            <Column body={this.actionTemplate} style={{ width: '10%', justifyContent: 'center' }} />
+                        </DataTable>
+                        <Dialog visible={this.state.dialogCertificate} header="Generar Certificado" modal={true} style={{ width: '30%' }} footer={dialogFooter} onHide={() => this.setState({ dialogCertificate: false })}>
+                            <div className="ui-grid ui-grid-responsive ui-fluid">
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Cliente</label></div>
+                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
+                                        <InputText placeholder='Nombre' onChange={(e) => this.setState({ cliente: e.target.value })} value={this.state.cliente} />
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Orden Producción</label></div>
+                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
+                                        <InputText placeholder='Número' onChange={(e) => this.setState({ order: e.target.value })} value={this.state.order} />
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Correo</label></div>
+                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
+                                        <InputText onChange={(e) => this.setState({ email: e.target.value })} value={this.state.email} />
+                                    </div>
+                                </div>
+                            </div>
+                        </Dialog>
+                    </TabPanel>
+                    <TabPanel header="HCC" leftIcon="fa fa-product-hunt">
+                        <Card style={{ backgroundColor: '#d4e157' }}>
+                            <div className='ui-g form-group ui-fluid'>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">Buscar Producto</label>
+                                    <AutoComplete minLength={1} placeholder="Buscar por nombre de producto" id="acAdvanced"
+                                        suggestions={this.state.filteredProducts} completeMethod={this.filterProducts.bind(this)} value={this.state.productName}
+                                        onChange={this.onProductValueChange.bind(this)} onDropdownClick={this.handleDropdownClick.bind(this)}
+                                    />
+                                </div>
+                                <div className='ui-g-2'>
+                                    <label htmlFor="float-input">Frecuencia</label>
+                                    <Dropdown disabled={this.state.enabledFrecuencia} options={periocidad} value={this.state.frecuencia} onChange={this.onDropdownChangeFrecuencia} autoWidth={false} placeholder="Selecione" />
+                                </div>
+                                <div className='ui-g-2'>
+                                    <label htmlFor="float-input">Lote</label>
+                                    <InputText placeholder='Lote' keyfilter="int" onChange={(e) => this.setState({ lote: e.target.value })} value={this.state.lote} />
+                                </div>
+                                <div className='ui-g-2' style={{ marginTop: '23px' }}>
+                                    <Button label='Generar HCC' onClick={this.generateHCC} />
+                                </div>
+                            </div>
+                        </Card>
+                        <Card style={{ display: this.state.pnlCabeceraPT, borderColor: '#d4e157', borderBottomWidth: 5 }}>
+                            <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                                <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', backgroundColor: '#457fca', borderRadius: 5 }}>
+                                    <h3 style={{ color: '#ffff' }}>LABORATORIO DE INSPECCIÓN Y ENSAYO PRODUCTO TERMINADO</h3>
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>NORMA:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.hccNorm}
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>REVISIÓN:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.review}
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>O/F:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.of}
+                                </div>
+                            </div>
+                            <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">HCC</label>
+                                    <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccPT: e.target.value })} value={this.state.hccPT} />
+                                </div>
+                            </div>
+                        </Card>
+                        <Card style={{ display: this.state.pnlCabeceraMP, borderColor: '#d4e157', borderBottomWidth: 5 }}>
+                            <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                                <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', backgroundColor: '#457fca', borderRadius: 5 }}>
+                                    <h3 style={{ color: '#ffff' }}>LABORATORIO DE INSPECCIÓN Y ENSAYO MATERIAS PRIMAS</h3>
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
+                                </div>
+                                <div className='ui-g-3'>
+                                    <strong style={{ marginRight: '10px' }}>CODIGO MATERIAL:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.idProduct}
+                                </div>
+                            </div>
+                            <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                                <div className='ui-g-3'>
+                                    <label htmlFor="float-input">Proveedor</label>
+                                    <Dropdown options={proveedoresMP} value={this.state.proveedor} onChange={this.onDropdownChangeProveedor} autoWidth={false} placeholder="Selecione" />
+                                </div>
+                                <div className='ui-g-3'>
+                                    <label htmlFor="float-input">Fecha Recepción</label>
+                                    <Calendar dateFormat="yy/mm/dd" value={this.state.receptDate} locale={es} showIcon="true" onChange={(e) => this.setState({ receptDate: e.value })}></Calendar>
+                                </div>
+                                <div className='ui-g-3'>
+                                    <label htmlFor="float-input">Pedido</label>
+                                    <InputText placeholder='Número' onChange={(e) => this.setState({ orderNumber: e.target.value })} value={this.state.orderNumber} />
+                                </div>
+                                <div className='ui-g-3'>
+                                    <label htmlFor="float-input">Hcc</label>
+                                    <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccMP: e.target.value })} value={this.state.hccMP} />
+                                </div>
+                            </div>
+                        </Card>
+                        <Card style={{ display: this.state.specificationPanel, marginTop: 5 }}>
+                            <div className="ui-g ui-fluid car-item" style={{ justifyContent: 'center', backgroundColor: '#457fca', borderRadius: 5 }}>
+                                <div className="ui-g-12 ui-md-3">
+                                    <strong style={{ color: '#ffff' }}>Propiedad</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-2">
+                                    <strong style={{ color: '#ffff' }}>Especificaciones</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-1">
+                                    <strong style={{ color: '#ffff' }}>Unidad</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-2 ui-fluid" style={{ textAlign: 'center' }}>
+                                    <strong style={{ color: '#ffff' }}>Resultado</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-3" style={{ textAlign: 'center' }}>
+                                    <strong style={{ color: '#ffff' }}>Cumple</strong>
+                                </div>
+                            </div>
+                        </Card>
+                        <DataList style={{ display: this.state.specificationList }} value={this.state.hCC.detail} itemTemplate={this.propertyTemplate.bind(this)} paginator={true} rows={70}></DataList>
+                        <Card style={{ display: this.state.resultsPanel }}>
+                            <div className="ui-g ui-fluid car-item" style={{ justifyContent: 'center', backgroundColor: '', borderRadius: 5 }}>
+                                <div className='ui-g-6'>
+                                    <label htmlFor="float-input">Observaciones</label>
+                                    <InputTextarea rows={5} value={this.state.observation} onChange={(e) => this.setState({ observation: e.target.value })} />
+                                </div>
+                                <div className='ui-g-6'>
+                                    <label htmlFor="float-input">Análisis</label>
+                                    <InputTextarea rows={5} value={this.state.analysis} onChange={(e) => this.setState({ analysis: e.target.value })} />
+                                </div>
+                            </div>
+                        </Card>
+                    </TabPanel>
+                </TabView>
 
-                        <div className='ui-g-4'>
-                            <label htmlFor="float-input">HCC</label>
-                            <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccPT: e.target.value })} value={this.state.hccPT} />
-                        </div>
-                    </div>
-                </Card>
-                <Card style={{ display: this.state.pnlCabeceraMP, borderColor: '#d4e157', borderBottomWidth: 5 }}>
-                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
-                        <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', backgroundColor: '#457fca', borderRadius: 5 }}>
-                            <h3 style={{ color: '#ffff' }}>LABORATORIO DE INSPECCIÓN Y ENSAYO MATERIAS PRIMAS</h3>
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
-                        </div>
-                        <div className='ui-g-3'>
-                            <strong style={{ marginRight: '10px' }}>CODIGO MATERIAL:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.idProduct}
-                        </div>
-                    </div>
-                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Proveedor</label>
-                            <Dropdown options={proveedoresMP} value={this.state.proveedor} onChange={this.onDropdownChangeProveedor} autoWidth={false} placeholder="Selecione" />
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Fecha Recepción</label>
-                            <Calendar dateFormat="yy/mm/dd" value={this.state.receptDate} locale={es} showIcon="true" onChange={(e) => this.setState({ receptDate: e.value })}></Calendar>
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Pedido</label>
-                            <InputText placeholder='Número' onChange={(e) => this.setState({ orderNumber: e.target.value })} value={this.state.orderNumber} />
-                        </div>
-                        <div className='ui-g-3'>
-                            <label htmlFor="float-input">Hcc</label>
-                            <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccMP: e.target.value })} value={this.state.hccMP} />
-                        </div>
-                    </div>
-                </Card>
-                <Card style={{ display: this.state.specificationPanel, marginTop: 5 }}>
-                    <div className="ui-g ui-fluid car-item" style={{ justifyContent: 'center', backgroundColor: '#457fca', borderRadius: 5 }}>
-                        <div className="ui-g-12 ui-md-3">
-                            <strong style={{ color: '#ffff' }}>Propiedad</strong>
-                        </div>
-                        <div className="ui-g-12 ui-md-2">
-                            <strong style={{ color: '#ffff' }}>Especificaciones</strong>
-                        </div>
-                        <div className="ui-g-12 ui-md-1">
-                            <strong style={{ color: '#ffff' }}>Unidad</strong>
-                        </div>
-                        <div className="ui-g-12 ui-md-2 ui-fluid" style={{ textAlign: 'center' }}>
-                            <strong style={{ color: '#ffff' }}>Resultado</strong>
-                        </div>
-                        <div className="ui-g-12 ui-md-3" style={{ textAlign: 'center' }}>
-                            <strong style={{ color: '#ffff' }}>Cumple</strong>
-                        </div>
-                    </div>
-                </Card>
-                <DataList style={{ display: this.state.specificationList }} value={this.state.hCC.detail} itemTemplate={this.propertyTemplate.bind(this)} paginator={true} rows={70}></DataList>
-                <Card style={{ display: this.state.resultsPanel }}>
-                    <div className="ui-g ui-fluid car-item" style={{ justifyContent: 'center', backgroundColor: '', borderRadius: 5 }}>
-                        <div className='ui-g-6'>
-                            <label htmlFor="float-input">Observaciones</label>
-                            <InputTextarea rows={5} value={this.state.observation} onChange={(e) => this.setState({ observation: e.target.value })} />
-                        </div>
-                        <div className='ui-g-6'>
-                            <label htmlFor="float-input">Análisis</label>
-                            <InputTextarea rows={5} value={this.state.analysis} onChange={(e) => this.setState({ analysis: e.target.value })} />
-                        </div>
-
-                    </div>
-                </Card>
             </div>
 
 

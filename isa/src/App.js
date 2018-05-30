@@ -12,10 +12,11 @@ import 'font-awesome/css/font-awesome.css';
 import './App.css';
 import jQuery from 'jquery';
 
-class App extends Component {
+var menu=[];
+export class App extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             layoutMode: 'static',
             profileMode: 'inline',
@@ -29,6 +30,7 @@ class App extends Component {
             darkMenu: false,
             menuActive: false,
             stateLogin:false,
+            menuObj: props,
         };
         
         this.onDocumentClick = this.onDocumentClick.bind(this);
@@ -38,7 +40,7 @@ class App extends Component {
         this.onTopbarItemClick = this.onTopbarItemClick.bind(this);
         this.onMenuItemClick = this.onMenuItemClick.bind(this);
         this.onRootMenuItemClick = this.onRootMenuItemClick.bind(this);
-        this.createMenu();
+        //this.createMenu();
     }
 
     onMenuClick(event) {
@@ -193,8 +195,31 @@ class App extends Component {
         element.setAttribute('href', newURL);
     }
 
-    createMenu() {
-        this.menu = [
+    createMenu(props) {
+        debugger;
+        var menuPrincipal=[];
+        props.role.menus.map(function(obj,index){
+            var menuItem={label:'', icon:'', command:()=>{window.location.hash=''}};
+            menuItem.label=obj.itemDescription;
+            menuItem.icon= obj.iconMenu;
+            
+            if(obj.subMenus.length !=0 ||obj.subMenus.length != undefined ){
+                menuItem.items=[];
+                obj.subMenus.map(function(obj2,i){
+                    var itemsAux={label:'', icon:'', command:undefined};
+                    itemsAux.label=obj2.desc;
+                    itemsAux.icon=obj2.icon;
+                    itemsAux.command=()=>{window.location.hash=obj2.ref};
+                    menuItem.items.push(itemsAux);
+                })
+
+            }else {
+                menuItem.command=()=> {window.location.hash=obj.ref};
+            }
+            menuPrincipal.push(menuItem);
+            menu= menuPrincipal;
+        })
+        this.menu2 = [
             {label: 'Inicio', icon: 'fa fa-fw fa-home', command: () => { window.location.hash="/"}},
             {
                 label: 'S.G.C', icon: 'fa fa-files-o',
@@ -235,6 +260,9 @@ class App extends Component {
     }
 
     render() {
+        var sesion= localStorage.getItem('dataSession');
+        this.createMenu(this.props);
+        debugger;
         let layoutClassName = classNames('layout-wrapper', {
             'menu-layout-static': this.state.layoutMode !== 'overlay',
             'menu-layout-overlay': this.state.layoutMode === 'overlay',
@@ -257,7 +285,7 @@ class App extends Component {
                             <div ref={(el) => this.layoutMenuScroller = el} className="nano">
                                 <div className="nano-content menu-scroll-content">
                                     
-                                    <AppMenu model={this.menu} onMenuItemClick={this.onMenuItemClick} onRootMenuItemClick={this.onRootMenuItemClick} 
+                                    <AppMenu model={menu} onMenuItemClick={this.onMenuItemClick} onRootMenuItemClick={this.onRootMenuItemClick} 
                                             layoutMode={this.state.layoutMode} active={this.state.menuActive} /> 
                                 </div>
                             </div>
@@ -275,4 +303,4 @@ class App extends Component {
   }
 }
 
-export default App;
+

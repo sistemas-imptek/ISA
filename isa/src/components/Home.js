@@ -11,8 +11,9 @@ export class Home extends Component {
         return <div className="ui-g">
             <div className="ui-g-12">
                 <div className="card">
-                    <h1>Home</h1>
-                    <p>Use this page to start from scratch and place your custom content.</p>
+                    <iframe id="iframeCenter" src="https://sway.com/s/TjUYUNK5FXmwgqwl/embed" width="100%"
+                        height="620px" frameborder="0">
+                    </iframe>
                 </div>
             </div>
         </div>

@@ -40,10 +40,10 @@ export class AppTopbar extends Component {
 
     render() {
         let topbarItemsClassName = classNames('topbar-items fadeInDown', {'topbar-items-visible': this.props.topbarMenuActive});
-
+        var sesion= JSON.parse(localStorage.getItem('dataSession'));
         return <div className="topbar clearfix">
                     <div className="topbar-left">
-                        <img alt="Logo" src="assets/layout/images/logo-imptek-white.svg" className="topbar-logo" />
+                        <img alt="Logo" src="assets/layout/images/logo-letter-white.png" className="topbar-logo" />
                     </div>
 
                     <div className="topbar-right">
@@ -115,7 +115,7 @@ export class AppTopbar extends Component {
                                 </ul>
                             </li>
                             <li className="topbar-item-name" style={{color:'#fff'}}>
-                                <span>Diego Alpala C.</span>
+                                <strong>Usuario: </strong><span>{sesion.employee.lastName+' '+sesion.employee.name}</span>
                             </li>
                            
                            

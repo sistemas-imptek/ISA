@@ -29,8 +29,8 @@
     }
 } */
 
-export function FetchAjax(WebRequest, addFunction){
-    fetch('http://localhost:8080/qualityQR/api', 
+export function FetchAjax(WebRequest, addFunction, Uri){
+    fetch(Uri, 
     {   method: 'POST',
         headers: {
           'Content-Type': 'application/json',
