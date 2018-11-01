@@ -114,47 +114,131 @@ export class Login extends Component {
             //backgroundColor: '#292b2c'
             //backgroundColor: '#D1DA28'
         }
+        const styles = {
+            login_block: {
+                //background: 'linear-gradient(to bottom, #FFB88C, #DE6262)',
+                background: '#DE6262',
+                float: 'left',
+                width: '100%',
+                padding: '50px',
+            },
+            banner_sec: {
+                background: "url(https://static.pexels.com/photos/33972/pexels-photo.jpg)  no-repeat left bottom",
+                backgroundSize: "cover",
+                minHeight: "500px",
+                borderRadius: "0 10px 10px 0",
+                padding: "0"
+            },
+            container: {
+                background: '#fff',
+                borderRadius: "10px",
+                boxShadow: "15px 20px 0px rgba(0,0,0,0.1)"
+            },
+            carousel_inner: {
+                borderRadius: "0 10px 10px 0"
+            },
+            carousel_caption: {
+                "textAlign": "left",
+                "left": "5%"
+            },
+            login_sec: {
+                padding: "50px 30px",
+                position: "relative"
+            },
+            login_sec__copy_text: {
+                position: "absolute",
+                width: "80%",
+                bottom: "20px",
+                fontSize: "13px",
+                textAlign: "center"
+            },
+            login_sec__copy_text_i: {
+                "color": "#FEB58A"
+            },
+            login_sec__copy_text_a: {
+                "color": "#E36262"
+            },
+            login_sec_h2: {
+                marginBottom: "30px",
+                fontWeight: "800",
+                fontSize: "30px",
+            color: "#DE6262"
+            },
+            login_sec_h2_after: {
+                "content": "\" \"",
+                "width": "100px",
+                "height": "5px",
+                "background": "#FEB58A",
+                "display": "block",
+                "marginTop": "20px",
+                "borderRadius": "3px",
+                "marginLeft": "auto",
+                "marginRight": "auto"
+            },
+            btn_login: {
+                background: "#DE6262",
+                color: "#fff",
+                fontWeight: "600"
+            },
+            banner_text: {
+                "width": "70%",
+                "position": "absolute",
+                "bottom": "40px",
+                "paddingLeft": "20px"
+            },
+            "banner_text_h2": {
+                "color": "#fff",
+                "fontWeight": "600"
+            },
+            banner_text_h2_after: {
+                "content": "\" \"",
+                "width": "100px",
+                "height": "5px",
+                "background": "#FFF",
+                "display": "block",
+                "marginTop": "20px",
+                "borderRadius": "3px"
+            },
+            banner_text_p: {
+                "color": "#fff"
+            }
+        }
 
         if (this.state.stateLogin) {
             return (
-                <div style={{ overflow: 'hidden', margin: '0 auto', justifyContent: 'center', textAlign:'center' }}>
+                <div style={{
+                    background: 'linear-gradient(to bottom, #4DA6DE, #D1DA28)', width: '100%', height: '100%', padding: '180px' }}>
                     <Growl ref={(el) => this.growl = el} />
-                    <div style={imgstyle}>
-
-                    </div>
-                    <div className="card ui-fluid" style={container}>
-
-                        <div style={formContent}>
-                            <div className="ui-g" style={{marginTop:'20%'}}>
-                                <div className="ui-g-12">
-                                    <img style={{ justifyContent: 'center', textAlign: 'center', marginBottom:'50px' }} src="assets/layout/images/logo-letter-white.png" />
-                                </div>
-                                <div className="ui-g-3" style={{ textAlign: 'center' }}>
-                                    <img src="assets/layout/images/login/icon-login.svg" />
-                                </div>
-                                <div className="ui-g-9" style={{ textAlign: 'right' }}>
-                                    <h2 className="welcome-text">Bienvenido</h2>
-                                    <span className="guest-sign-in">Inicia Sesión Isa-Imptek</span>
-                                </div>
-                                <div className="ui-g-12" style={{ textAlign: 'left' }}>
-                                    <label className="login-label">Usuario</label>
-                                    <div className="login-input">
-                                        <InputText type="text" className="ui-inputtext ui-widget ui-state-default ui-corner-all" onChange={(e) => this.setState({ user: e.target.value })} />
+                    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
+                    {/*---- Include the above in your HEAD tag --------*/}
+                    <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
+                        <div className='ui-g-6' style={{ background: '#fff', borderRadius: "10px", boxShadow: "15px 20px 0px rgba(0,0,0,0.1)" }}>
+                            <div className="ui-g-6" style={{ padding: "50px 30px", position: "relative" }} >
+                                <h2 className="text-center" style={{marginBottom: "30px",fontWeight: "800",fontSize: "30px",color: "#4DA6DE"}}>Iniciar Sesión</h2>
+                                <div className="login-form">
+                                    <div className="form-group">
+                                        <label htmlFor="exampleInputEmail1" className="text-uppercase">Usuario</label>
+                                        <input type="text" className="form-control" placeholder onChange={(e) => this.setState({ user: e.target.value })}/>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="exampleInputPassword1" className="text-uppercase">Contraseña</label>
+                                        <input type="password" className="form-control" placeholder onChange={(e) => this.setState({ password: e.target.value })} />
+                                    </div>
+                                    <div className="form-check">
+                                        
+                                        <button className="btn float-right" style={{ background: "#4DA6DE",color: "#fff",fontWeight: "600"}} onClick={this.validateUser} >Aceptar</button>
                                     </div>
                                 </div>
-                                <div className="ui-g-12" style={{ textAlign: 'left' }}>
-                                    <label className="login-label">Contraseña</label>
-                                    <div className="login-input">
-                                        <InputText type="password" className="ui-inputtext ui-widget ui-state-default ui-corner-all" onChange={(e) => this.setState({ password: e.target.value })} />
-                                    </div>
-                                </div>
-                                <div className="ui-g-12 ui-md-6 button-pane">
-                                    <Button label="Aceptar" onClick={this.validateUser} className="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" />
-                                </div>
+                                {/* <div className="copy-text">Elaborado por T.I ASTS <i className="fa fa-heart" /> by <a href="http://grafreez.com">Grafreez.com</a></div> */}
+                                <div className="copy-text" style={{position: "absolute",width: "80%", bottom: "20px",fontSize: "13px", textAlign: "center"}} >Elaborado por el área T.I </div>
+                            </div>
+                            <div className="ui-g-6 banner-sec" style={{background:'#4DA6DE', borderRadius: "0 10px 10px 0",height:'100%', padding: "0",alignSelf:'center' }}>
+                                <img style={{ justifyContent: 'center', textAlign: 'center', marginTop: '60px', width:'100%', height:'60%', paddingLeft:'15px', paddingRight:'15px' }} src="assets/layout/images/logo-imptek-white.svg" />
                             </div>
                         </div>
                     </div>
-                </div >
+
+                </div>
             )
         } else {
             return (<div>

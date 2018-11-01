@@ -50,6 +50,7 @@ export class HCC extends Component {
             frecuencia: '',
             tipo: '',
             hccPT: '',
+            hccOF:'',
             hccMP: '',
             orderNumber: '',
             checked1: false,
@@ -166,7 +167,6 @@ export class HCC extends Component {
                     that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
 
                 }
-
             })
         } else {
 
@@ -258,6 +258,7 @@ export class HCC extends Component {
             })
             if (this.state.hCC.product.typeProduct == 'PT') {
                 this.state.hCC.sapCode = this.state.hccPT;
+                this.state.hCC.of= this.state.hccOF;
             } else {
                 this.state.hCC.sapCode = this.state.hccMP;
                 this.state.hCC.of = this.state.proveedor;
@@ -289,6 +290,11 @@ export class HCC extends Component {
                             productName: '',
                             lote: '',
                         });
+                        GetAllHCCs(function (items) {
+                            console.log(items)
+                            var hccsFiles = items;
+                            that.setState({ hccFiles: items })
+                        })
 
                         break;
                     case 'ERROR':
@@ -363,7 +369,6 @@ export class HCC extends Component {
         </div>;
         return (
             <div>
-
                 <Growl ref={(el) => this.growl = el} />
                 <Button label='Guardar' icon='fa fa-save' onClick={this.saveHCC} style={{
                     display: this.state.btnGuardarHCC,
@@ -449,14 +454,15 @@ export class HCC extends Component {
                                 <div className='ui-g-3'>
                                     <strong style={{ marginRight: '10px' }}>REVISIÓN:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.review}
                                 </div>
-                                <div className='ui-g-3'>
-                                    <strong style={{ marginRight: '10px' }}>O/F:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.of}
-                                </div>
                             </div>
                             <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
                                 <div className='ui-g-4'>
                                     <label htmlFor="float-input">HCC</label>
                                     <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccPT: e.target.value })} value={this.state.hccPT} />
+                                </div>
+                                <div className='ui-g-4'>
+                                    <label htmlFor="float-input">Orden Fabricación</label>
+                                    <InputText placeholder='Número' onChange={(e) => this.setState({ hccOF: e.target.value })} value={this.state.hccOF} />
                                 </div>
                             </div>
                         </Card>

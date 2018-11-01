@@ -6,8 +6,8 @@ import { AjaxPostService, FetchAjax } from './ajax-handler';
 var intentosConexion = 0;
 var Request;
 /* ================= URIs PARA ENVIO DE LA DATA ======================*/
-var security = 'http://localhost:8080/security/api';
-var quality = 'http://localhost:8080/qualityQR/api';
+var security = 'http://localhost:8440/security/api';
+var quality = 'http://localhost:8440/qualityQR/api';
 var rrhh = '';
 var sgc = '';
 
