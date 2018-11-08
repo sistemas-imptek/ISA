@@ -263,3 +263,7 @@ export class Login extends Component {
 
 
 }
+
+export function logout(){
+    that.setState({stateLogin: true})
+}

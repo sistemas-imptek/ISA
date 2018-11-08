@@ -15,13 +15,13 @@ import { DataList } from 'primereact/components/datalist/DataList';
 import { InputSwitch } from 'primereact/components/inputswitch/InputSwitch';
 import { Calendar } from 'primereact/components/calendar/Calendar';
 import { Growl } from 'primereact/components/growl/Growl';
-
+import { RadioButton } from 'primereact/components/radiobutton/RadioButton';
 
 /* ============  D A T A    C A T A L O G O  S =============== */
 import { periocidad, tipoProducto } from '../../global/catalogs';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate } from '../../utils/TransactionsCalidad';
+import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients } from '../../utils/TransactionsCalidad';
 
 /* ====================  U T I L S  ======== */
 import { formattedDate } from '../../utils/FormatDate';
@@ -32,6 +32,7 @@ var that;
 var DataResult = {};
 var DataResultCumple = {};
 var proveedoresMP = [];
+var clientNames = []; // Variable para formar el Array de nombres de los clientes.
 
 export class HCC extends Component {
 
@@ -50,7 +51,7 @@ export class HCC extends Component {
             frecuencia: '',
             tipo: '',
             hccPT: '',
-            hccOF:'',
+            hccOF: '',
             hccMP: '',
             orderNumber: '',
             checked1: false,
@@ -59,12 +60,15 @@ export class HCC extends Component {
             proveedor: '',
             analysis: '',
             observation: '',
-            hccFiles: [],
+            hccFilesFilter: [],
+            hccFilesAll: [],
             selectedHCC: undefined,
             dialogCertificate: false,
             cliente: undefined,
             email: 'svillacis@imptek.com',
-            order: undefined
+            order: undefined,
+            hccType: undefined,
+            clientList: [],
 
         };
         that = this;
@@ -80,11 +84,13 @@ export class HCC extends Component {
         this.actionTemplate = this.actionTemplate.bind(this);
         this.showDialogCertifiacte = this.showDialogCertifiacte.bind(this);
         this.generateCertificate = this.generateCertificate.bind(this);
+        this.onRadioChange = this.onRadioChange.bind(this);
+        this.findObjCliente = this.findObjCliente.bind(this);
     }
 
     /* =============== I N I C I O   F U N C I O N E S ======================= */
 
-    /* Métodos  Auto Completado */
+    /* Métodos  Auto Completado Buscar Producto */
     handleDropdownClick() {
         this.setState({ filteredBrands: [] });
         //mimic remote call
@@ -116,6 +122,29 @@ export class HCC extends Component {
     }
     /* FIn Métodos  Auto Completado */
 
+    /* Métodos  Auto Completado Buscar Clinte */
+    handleDropdownClickClientFind() {
+        this.setState({ filteredClients: [] });
+        //mimic remote call
+        setTimeout(() => {
+            this.setState({ filteredClients: this.clients });
+        }, 100)
+    }
+    filterClients(event) {
+        debugger
+        let results = clientNames.filter((brand) => {
+            return brand.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+        this.setState({ filteredClients: results });
+    }
+    onClientValueChange(e) {
+        debugger;
+        this.setState({ clientName: e.value, filteredClients: null });
+    }
+
+    /* FIn Métodos  Auto Completado *
+
+
     /* Mostrar Mensajes */
     showError(message) {
         this.growl.show({ severity: 'error', summary: 'Error', detail: message });
@@ -139,6 +168,25 @@ export class HCC extends Component {
         debugger;
         DataResultCumple[id] = e.value;
         this.setState({ reloadTextInput: true });
+    }
+    /* Metodo para onRadioButton hccTYpe */
+    onRadioChange(event) {
+        debugger
+        console.log(this.state.hccFilesAll);
+        var newData = [];
+        this.state.hccFilesAll.map(function (obj, index) {
+            switch (event.value) {
+                case 'PT':
+                    if (obj.product.typeProduct == 'PT')
+                        newData.push(obj);
+                    break;
+                case 'MP':
+                    if (obj.product.typeProduct == 'MP')
+                        newData.push(obj);
+                    break;
+            }
+        })
+        this.setState({ hccType: event.value, hccFilesFilter: newData })
     }
 
     /* Método para generar HCC */
@@ -197,9 +245,17 @@ export class HCC extends Component {
 
     /* Template para accion en Tabla HCC */
     actionTemplate(rowData, column) {
-        return <div>
-            <Button label='Certificado' type="button" icon='fa-print' className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
-        </div>;
+        switch (rowData.product.typeProduct) {
+            case 'PT':
+                return <div>
+                    <Button label='Certificado' type="button" icon='fa-print' className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+                </div>;
+                break;
+
+            case 'MP':
+                return <div></div>;
+                break;
+        }
     }
     showDialogCertifiacte(data) {
         this.setState({
@@ -258,7 +314,7 @@ export class HCC extends Component {
             })
             if (this.state.hCC.product.typeProduct == 'PT') {
                 this.state.hCC.sapCode = this.state.hccPT;
-                this.state.hCC.of= this.state.hccOF;
+                this.state.hCC.of = this.state.hccOF;
             } else {
                 this.state.hCC.sapCode = this.state.hccMP;
                 this.state.hCC.of = this.state.proveedor;
@@ -310,17 +366,16 @@ export class HCC extends Component {
 
     /* Metodo para generar Certificado */
     generateCertificate() {
-        var objAux = { client: '', order: '', hccSapCode: '', email: '' };
-        objAux.client = this.state.cliente;
-        objAux.hccSapCode = this.state.selectedHCC.sapCode;
+        var objAux = { hccHead: { sapCode: '' }, clientImptek: { idClient: undefined }, email: '' };
+        objAux.clientImptek.idClient = this.findObjCliente(this.state.clientName);
+        objAux.hccHead.sapCode = this.state.selectedHCC.sapCode;
         objAux.email = this.state.email;
-        objAux.order = this.state.order;
-        GenerateCertificate(objAux, function(data){
+        GenerateCertificate(objAux, function (data) {
             switch (data.status) {
                 case 'OK':
                     that.showSuccess(data.message);
                     that.setState({
-                        dialogCertificate: false, cliente:'', order:'', 
+                        dialogCertificate: false, cliente: '', order: '',
                     });
                     break;
                 case 'ERROR':
@@ -328,7 +383,15 @@ export class HCC extends Component {
                     break;
             }
         })
+    }
+    findObjCliente(name){
+        var idclienteTMP=undefined;
+        this.state.clientList.map(function(obj){
+            if(obj.nameClient=== name)
+                idclienteTMP=obj.idClient;
+        })
 
+        return idclienteTMP;
     }
 
 
@@ -338,6 +401,7 @@ export class HCC extends Component {
     componentWillMount() {
         nameProducts = [];
         var hccsFiles = [];
+        clientNames = [];
         GetAllProducts(function (items) {
             items.map(function (value, index) {
                 nameProducts.push(value.nameProduct);
@@ -345,10 +409,15 @@ export class HCC extends Component {
             that.setState({ products: items })
         });
         GetAllHCCs(function (items) {
-            console.log(items)
             hccsFiles = items;
-            that.setState({ hccFiles: items })
-        })
+            that.setState({ hccFilesAll: items, hccFilesFilter: items })
+        });
+        GetAllClients(function (items) {
+            items.map(function (value, index) {
+                clientNames.push(value.nameClient);
+            })
+            that.setState({ clientList: items })
+        });
     }
     render() {
         let es = {
@@ -386,7 +455,20 @@ export class HCC extends Component {
                 <TabView style={{ marginBottom: '10px' }}>
 
                     <TabPanel header="Consultar HCC" leftIcon="fa fa-product-hunt">
-                        <DataTable value={this.state.hccFiles} paginator={true} rows={15} header={header} globalFilter={this.state.globalFilter}>
+                        <div className="card card-w-title">
+                            <h3>Filtros</h3>
+                            <div className="ui-g">
+                                <div className="ui-g-12 ui-md-1">
+                                    <RadioButton value="MP" inputId="rb1" onChange={this.onRadioChange} checked={this.state.hccType === "MP"} />
+                                    <label htmlFor="rb1" style={{ marginLeft: '5px' }}>Materia Prima</label>
+                                </div>
+                                <div className="ui-g-12 ui-md-2">
+                                    <RadioButton value="PT" inputId="rb2" onChange={this.onRadioChange} checked={this.state.hccType === "PT"} />
+                                    <label htmlFor="rb2" style={{ marginLeft: '5px' }}>Producto Terminado</label>
+                                </div>
+                            </div>
+                        </div>
+                        <DataTable value={this.state.hccFilesFilter} paginator={true} rows={15} header={header} globalFilter={this.state.globalFilter}>
                             <Column field="sapCode" header="HCC" style={{ width: '10%' }} />
                             <Column field="hcchBatch" header="Lote" style={{ width: '10%' }} />
                             <Column field="product.nameProduct" header="Producto" style={{ width: '25%' }} />
@@ -399,13 +481,10 @@ export class HCC extends Component {
                                 <div className="ui-grid-row">
                                     <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Cliente</label></div>
                                     <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
-                                        <InputText placeholder='Nombre' onChange={(e) => this.setState({ cliente: e.target.value })} value={this.state.cliente} />
-                                    </div>
-                                </div>
-                                <div className="ui-grid-row">
-                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Orden Producción</label></div>
-                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
-                                        <InputText placeholder='Número' onChange={(e) => this.setState({ order: e.target.value })} value={this.state.order} />
+                                        <AutoComplete minLength={1} placeholder="Nombre" id="acAdvanced"
+                                            suggestions={this.state.filteredClients} completeMethod={this.filterClients.bind(this)} value={this.state.clientName}
+                                            onChange={this.onClientValueChange.bind(this)} onDropdownClick={this.handleDropdownClickClientFind.bind(this)}
+                                        />
                                     </div>
                                 </div>
                                 <div className="ui-grid-row">

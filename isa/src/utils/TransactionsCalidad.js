@@ -20,10 +20,11 @@ var Transactions = {
     CertificateGenerate:{transactionName: "GenerateQualityCertificate",   transactionCode: "TxGQC", parameters:{} },
     ObtenerDataProducto: {},
     GetCatalogsPNC: { transactionName: "Request", transactionCode: "TxRNCP", parameters: "" },
-    GetAllHCC: { transactionName: "GetAllHCC_TP", transactionCode: "TxQQRgetHCCTP", parameters: 'PT' },
+    GetAllHCC: { transactionName: "GetAllHCC_TP", transactionCode: "TxQQRgetHCCTP", parameters:null },
     GetAllPNC: { transactionName: "GetAllNCP", transactionCode: "TxQQRgeAlltNCP", parameters: "" },
     PNCSave:{transactionName: "SetNCP", transactionCode : "TxQQRsetNCP", parameters:{} },
     ClosePNC:{transactionName: "Close NCP", transactionCode: "TxQQRcloseNCP", parameters: {idNCP: 0}},
+    GetAllClients:{transactionName: "GetAllClients",transactionCode: "TxQQRGAC",parameters: null},
 }
 
 export function productSave(producto, addFunction) {
@@ -91,7 +92,7 @@ export function GetCatalogsPNC(addFunction) {
 
 export function GetAllHCCs(addFunction) {
     var transaction = Transactions.GetAllHCC;
-    transaction.parameters = 'PT'
+    transaction.parameters =null;
     SendPostRequestToService(transaction, addFunction,'TxQuality');
 }
 
@@ -115,8 +116,15 @@ export function ClosedPNC(idPNC, addFunction){
 }
 
 export function GenerateCertificate(data, addFunction,){
+    debugger
     var transaction= Transactions.CertificateGenerate;
     transaction.parameters={};
     transaction.parameters=data;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+}
+
+export function GetAllClients(addFunction){
+    var transaction= Transactions.GetAllClients;
+    transaction.parameters=null;
     SendPostRequestToService(transaction, addFunction,'TxQuality');
 }

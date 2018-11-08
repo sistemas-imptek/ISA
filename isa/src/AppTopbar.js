@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
+import {logout} from './components/autentication/login'
 export class AppTopbar extends Component {
 
     static defaultProps = {
@@ -36,6 +36,12 @@ export class AppTopbar extends Component {
                 item: item
             });
         }
+    }
+
+    Logout(){
+        debugger
+        console.log('Cierre de sesion')
+        logout();
     }
 
     render() {
@@ -106,7 +112,7 @@ export class AppTopbar extends Component {
                                         </a>
                                     </li>
                                     <li role="menuitem">
-                                        <a>
+                                        <a onClick={(e) => this.Logout()}>
                                             <i className="fa fa-sign-out"></i>
                                             <span>Cerrar Sesión</span>
                                         </a>

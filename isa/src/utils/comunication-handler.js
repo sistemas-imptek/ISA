@@ -24,7 +24,9 @@ function decide(tx) {
 
 export function SendPostRequestToService(WebRequest, addFunction, typeTx, platForm) {
     debugger;
-    WebRequest.parameters = encryptAES(WebRequest.parameters);
+    if(WebRequest.parameters!=null){
+        WebRequest.parameters = encryptAES(WebRequest.parameters);
+    }    
     var isAsync = true;
     var url=decide(typeTx);
     //return AjaxPostService(WebRequest, addFunction, isAsync);

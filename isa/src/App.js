@@ -196,7 +196,6 @@ export class App extends Component {
     }
 
     createMenu(props) {
-        debugger;
         var menuPrincipal=[];
         props.role.menus.map(function(obj,index){
             var menuItem={label:'', icon:'', command:()=>{window.location.hash=''}};
@@ -262,7 +261,6 @@ export class App extends Component {
     render() {
         var sesion= localStorage.getItem('dataSession');
         this.createMenu(this.props);
-        debugger;
         let layoutClassName = classNames('layout-wrapper', {
             'menu-layout-static': this.state.layoutMode !== 'overlay',
             'menu-layout-overlay': this.state.layoutMode === 'overlay',
