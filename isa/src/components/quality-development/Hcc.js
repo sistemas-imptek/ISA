@@ -69,6 +69,8 @@ export class HCC extends Component {
             order: undefined,
             hccType: undefined,
             clientList: [],
+            referralGuide: undefined,
+            fieldReferralGuide: 'none'
 
         };
         that = this;
@@ -202,9 +204,13 @@ export class HCC extends Component {
             GenerateHCC(result.idProduct, this.state.lote, this.state.frecuencia, function (item) {
                 console.log(item);
                 that.setData(item.detail);
+                that.setState({fieldReferralGuide: 'none'})
                 console.log(DataResult);
                 if (item.product.typeProduct == 'PT') {
-                    that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
+                    if (item.product.typeProductTxt === 'Emulsiones Asfálticas') {
+                        that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '', fieldReferralGuide: '' })
+                    } else
+                        that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
                 } else {
                     item.product.providers.map(function (obj, index) {
                         var objAux = { label: '', value: '' };
@@ -315,6 +321,9 @@ export class HCC extends Component {
             if (this.state.hCC.product.typeProduct == 'PT') {
                 this.state.hCC.sapCode = this.state.hccPT;
                 this.state.hCC.of = this.state.hccOF;
+                if(this.state.hCC.product.typeProductTxt=='Emulsiones Asfálticas') {
+                    this.state.hCC.referralGuide=this.state.referralGuide;
+                }
             } else {
                 this.state.hCC.sapCode = this.state.hccMP;
                 this.state.hCC.of = this.state.proveedor;
@@ -340,7 +349,7 @@ export class HCC extends Component {
                         DataResult = {};
                         DataResultCumple = {};
                         that.setState({
-                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none',
+                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide:'none',
                             resultsPanel: 'none',
                             btnGuardarHCC: 'none',
                             productName: '',
@@ -384,11 +393,11 @@ export class HCC extends Component {
             }
         })
     }
-    findObjCliente(name){
-        var idclienteTMP=undefined;
-        this.state.clientList.map(function(obj){
-            if(obj.nameClient=== name)
-                idclienteTMP=obj.idClient;
+    findObjCliente(name) {
+        var idclienteTMP = undefined;
+        this.state.clientList.map(function (obj) {
+            if (obj.nameClient === name)
+                idclienteTMP = obj.idClient;
         })
 
         return idclienteTMP;
@@ -528,7 +537,7 @@ export class HCC extends Component {
                                     <strong style={{ marginRight: '10px' }}>PRODUCTO:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.nameProduct}
                                 </div>
                                 <div className='ui-g-3'>
-                                    <strong style={{ marginRight: '10px' }}>NORMA:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.hccNorm}
+                                    <strong style={{ marginRight: '10px' }}>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.product.typeProductTxt}</strong>
                                 </div>
                                 <div className='ui-g-3'>
                                     <strong style={{ marginRight: '10px' }}>REVISIÓN:</strong>{Object.keys(this.state.hCC).length === 0 ? '' : this.state.hCC.review}
@@ -542,6 +551,10 @@ export class HCC extends Component {
                                 <div className='ui-g-4'>
                                     <label htmlFor="float-input">Orden Fabricación</label>
                                     <InputText placeholder='Número' onChange={(e) => this.setState({ hccOF: e.target.value })} value={this.state.hccOF} />
+                                </div>
+                                <div className='ui-g-4' style={{ display: this.state.fieldReferralGuide }}>
+                                    <label htmlFor="float-input">Guía Remisión</label>
+                                    <InputText placeholder='Número' onChange={(e) => this.setState({ referralGuide: e.target.value })} value={this.state.referralGuide} />
                                 </div>
                             </div>
                         </Card>
