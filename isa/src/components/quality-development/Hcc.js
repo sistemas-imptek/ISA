@@ -204,7 +204,7 @@ export class HCC extends Component {
             GenerateHCC(result.idProduct, this.state.lote, this.state.frecuencia, function (item) {
                 console.log(item);
                 that.setData(item.detail);
-                that.setState({fieldReferralGuide: 'none'})
+                that.setState({ fieldReferralGuide: 'none' })
                 console.log(DataResult);
                 if (item.product.typeProduct == 'PT') {
                     if (item.product.typeProductTxt === 'Emulsiones Asfálticas') {
@@ -254,12 +254,14 @@ export class HCC extends Component {
         switch (rowData.product.typeProduct) {
             case 'PT':
                 return <div>
-                    <Button label='Certificado' type="button" icon='fa-print' className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+                    <Button type="button" icon='fa-print'  style={{width:'20%'}} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
                 </div>;
                 break;
 
             case 'MP':
-                return <div></div>;
+                return <div>
+                    <Button type="button" icon='fa-print'  style={{width:'20%'}} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+                </div>;
                 break;
         }
     }
@@ -321,8 +323,8 @@ export class HCC extends Component {
             if (this.state.hCC.product.typeProduct == 'PT') {
                 this.state.hCC.sapCode = this.state.hccPT;
                 this.state.hCC.of = this.state.hccOF;
-                if(this.state.hCC.product.typeProductTxt=='Emulsiones Asfálticas') {
-                    this.state.hCC.referralGuide=this.state.referralGuide;
+                if (this.state.hCC.product.typeProductTxt == 'Emulsiones Asfálticas') {
+                    this.state.hCC.referralGuide = this.state.referralGuide;
                 }
             } else {
                 this.state.hCC.sapCode = this.state.hccMP;
@@ -349,7 +351,7 @@ export class HCC extends Component {
                         DataResult = {};
                         DataResultCumple = {};
                         that.setState({
-                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide:'none',
+                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
                             resultsPanel: 'none',
                             btnGuardarHCC: 'none',
                             productName: '',
@@ -465,9 +467,11 @@ export class HCC extends Component {
 
                     <TabPanel header="Consultar HCC" leftIcon="fa fa-product-hunt">
                         <div className="card card-w-title">
-                            <h3>Filtros</h3>
                             <div className="ui-g">
                                 <div className="ui-g-12 ui-md-1">
+                                    <strong>Filtros</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-2">
                                     <RadioButton value="MP" inputId="rb1" onChange={this.onRadioChange} checked={this.state.hccType === "MP"} />
                                     <label htmlFor="rb1" style={{ marginLeft: '5px' }}>Materia Prima</label>
                                 </div>
@@ -483,7 +487,7 @@ export class HCC extends Component {
                             <Column field="product.nameProduct" header="Producto" style={{ width: '25%' }} />
                             <Column field="dateCreate" header="Fecha" style={{ width: '10%' }} />
                             <Column field="analysis" header="Análisis" style={{ width: '35%' }} />
-                            <Column body={this.actionTemplate} style={{ width: '10%', justifyContent: 'center' }} />
+                            <Column header="Certificado" body={this.actionTemplate} style={{ justifyContent: 'center', textAlign:'center' }} />
                         </DataTable>
                         <Dialog visible={this.state.dialogCertificate} header="Generar Certificado" modal={true} style={{ width: '30%' }} footer={dialogFooter} onHide={() => this.setState({ dialogCertificate: false })}>
                             <div className="ui-grid ui-grid-responsive ui-fluid">
