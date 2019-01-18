@@ -359,7 +359,7 @@ export class HCC extends Component {
                         this.state.hCC.referralGuide = this.state.referralGuide;
                     }
                 } else {
-                    this.state.hCC.sapCode = this.state.hccMP;
+                    this.state.hCC.sapCode = this.state.hccPT;
                     this.state.hCC.of = this.state.proveedor;
                     var nameProviderTMP = undefined;
                     this.state.hCC.product.providers.map(function (obj) {
@@ -628,7 +628,7 @@ export class HCC extends Component {
                                 </div>
                                 <div className='ui-g-3'>
                                     <label htmlFor="float-input">Hcc</label>
-                                    <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccMP: e.target.value })} value={this.state.hccMP} />
+                                    <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccPT: e.target.value })} value={this.state.hccPT} />
                                 </div>
                             </div>
                         </Card>
