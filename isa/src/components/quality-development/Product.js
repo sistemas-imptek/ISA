@@ -323,8 +323,8 @@ export class Product extends Component {
         var header = <div style={{ 'textAlign': 'left' }}>
             <Toolbar>
                 <div className="ui-toolbar-group-left">
-                    <Button label="Nuevo" icon="fa-plus" onClick={() => this.setState({ showModalProduct: true })} />
-                    <Button label="Editar" icon="fa-edit" onClick={() => this.setState({ showModalProduct: true })} />
+                    {/* <Button label="Nuevo" icon="fa-plus" onClick={() => this.setState({ showModalProduct: true })} />
+                    <Button label="Editar" icon="fa-edit" onClick={() => this.setState({ showModalProduct: true })} /> */}
                 </div>
                 <div className="ui-toolbar-group-right">
                     <i className="fa fa-search" style={{ margin: '4px 4px 0 0' }}></i>
@@ -349,7 +349,7 @@ export class Product extends Component {
                                     </DataTable>
                                 </div>
                             </TabPanel>
-                            <TabPanel header="Especificaciones" leftIcon="fa fa-book">
+                            {/* <TabPanel header="Especificaciones" leftIcon="fa fa-book">
                                 <div className='ui-g form-group ui-fluid' style={{ alignItems: 'center' }}>
                                     <div className='ui-g-8'>
                                         <div className="ui-inputgroup">
@@ -395,7 +395,7 @@ export class Product extends Component {
 
                                 </Card>
 
-                            </TabPanel>
+                            </TabPanel> */}
                         </TabView>
                     </div>
 

@@ -70,7 +70,10 @@ export class HCC extends Component {
             hccType: undefined,
             clientList: [],
             referralGuide: undefined,
-            fieldReferralGuide: 'none'
+            fieldReferralGuide: 'none',
+            reloadTextInput: false,
+            propertyDetail: [],
+            productionDate: undefined
 
         };
         that = this;
@@ -88,6 +91,7 @@ export class HCC extends Component {
         this.generateCertificate = this.generateCertificate.bind(this);
         this.onRadioChange = this.onRadioChange.bind(this);
         this.findObjCliente = this.findObjCliente.bind(this);
+        this.propertyDelete = this.propertyDelete.bind(this);
     }
 
     /* =============== I N I C I O   F U N C I O N E S ======================= */
@@ -194,6 +198,11 @@ export class HCC extends Component {
     /* Método para generar HCC */
     generateHCC() {
         var result = {};
+        DataResult = {},
+        DataResultCumple = {};
+        if(this.state.specificationList==''){
+            this.setState({specificationList :'none', hCC: {}})
+        }
         debugger;
         if (this.state.productName != '' && this.state.lote != '') {
             this.state.products.map(function (value, index) {
@@ -204,13 +213,12 @@ export class HCC extends Component {
             GenerateHCC(result.idProduct, this.state.lote, this.state.frecuencia, function (item) {
                 console.log(item);
                 that.setData(item.detail);
-                that.setState({ fieldReferralGuide: 'none' })
                 console.log(DataResult);
                 if (item.product.typeProduct == 'PT') {
                     if (item.product.typeProductTxt === 'Emulsiones Asfálticas') {
                         that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '', fieldReferralGuide: '' })
                     } else
-                        that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
+                        that.setState({ hCC: item, pnlCabeceraPT: '', pnlCabeceraMP: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '', fieldReferralGuide: 'none' })
                 } else {
                     item.product.providers.map(function (obj, index) {
                         var objAux = { label: '', value: '' };
@@ -224,10 +232,12 @@ export class HCC extends Component {
             })
         } else {
 
-            this.showError();
+            this.showError('Datos Incompletos');
         }
     }
     setData(data) {
+        DataResult = {};
+        DataResultCumple = {};
         data.map(function (item, index) {
             switch (item.typeProperty) {
                 case 'V':
@@ -254,13 +264,13 @@ export class HCC extends Component {
         switch (rowData.product.typeProduct) {
             case 'PT':
                 return <div>
-                    <Button type="button" icon='fa-print'  style={{width:'20%'}} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+                    <Button type="button" icon='fa-print' style={{ width: '20%' }} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
                 </div>;
                 break;
 
             case 'MP':
                 return <div>
-                    <Button type="button" icon='fa-print'  style={{width:'20%'}} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
+                    <Button type="button" icon='fa-print' style={{ width: '20%' }} className="ui-button-success" onClick={() => this.showDialogCertifiacte(rowData)}></Button>
                 </div>;
                 break;
         }
@@ -269,6 +279,22 @@ export class HCC extends Component {
         this.setState({
             dialogCertificate: true, selectedHCC: data
         })
+    }
+
+
+    /* Function for property delete of specifications test hcc */
+    propertyDelete(codeProperty) {
+        debugger;
+        console.log(codeProperty);
+        var detailTMP = [];
+        this.state.hCC.detail.map(function (i) {
+            if (i.idProperty != codeProperty)
+                detailTMP.push(i);
+        })
+
+        this.state.hCC.detail = detailTMP;
+        this.setData(detailTMP);
+        this.setState({})
     }
 
 
@@ -294,10 +320,13 @@ export class HCC extends Component {
                     {prop.unit}
                 </div>
                 <div className="ui-g-12 ui-md-2 ui-fluid">
-                    <InputText placeholder='Resultado' value={DataResult[prop.idProperty]} onChange={(e) => this.onWriting(e, prop.idProperty)} />
+                    <InputText placeholder='Resultado' value={DataResult[prop.idProperty] ? DataResult[prop.idProperty] : ''} onChange={(e) => this.onWriting(e, prop.idProperty)} />
                 </div>
-                <div className="ui-g-12 ui-md-3">
+                <div className="ui-g-12 ui-md-1">
                     <InputSwitch onLabel="Si" offLabel="No" checked={DataResultCumple[prop.idProperty]} onChange={(e) => this.onChangeBasic(e, prop.idProperty)} style={{ marginLeft: '30px' }} />
+                </div>
+                <div className="ui-g-12 ui-md-1" style={{ justifyContent: 'center', textAlign: 'center' }}>
+                    <Button icon="fa fa-times" className="danger-btn" onClick={() => this.propertyDelete(prop.idProperty)} />
                 </div>
             </div>
         );
@@ -306,72 +335,78 @@ export class HCC extends Component {
     saveHCC() {
         debugger;
         var detailAUX = [];
-        if (this.state.hCC.detail.length == Object.keys(DataResult).length) {
-            this.state.hCC.detail.map(function (item, index) {
-                switch (item.typeProperty) {
-                    case 'T':
-                        item.result = DataResult[item.idProperty];
-                        item.passTest = DataResultCumple[item.idProperty];
-                        break;
-                    case 'V':
-                        item.resultText = DataResult[item.idProperty];
-                        item.passTest = DataResultCumple[item.idProperty];
-                        break;
-                }
-                detailAUX.push(item);
-            })
-            if (this.state.hCC.product.typeProduct == 'PT') {
-                this.state.hCC.sapCode = this.state.hccPT;
-                this.state.hCC.of = this.state.hccOF;
-                if (this.state.hCC.product.typeProductTxt == 'Emulsiones Asfálticas') {
-                    this.state.hCC.referralGuide = this.state.referralGuide;
-                }
-            } else {
-                this.state.hCC.sapCode = this.state.hccMP;
-                this.state.hCC.of = this.state.proveedor;
-                var nameProviderTMP = undefined;
-                this.state.hCC.product.providers.map(function (obj) {
-                    if (that.state.proveedor == obj.idProvider) {
-                        nameProviderTMP = obj.nameProvider;
+        var sesion = JSON.parse(localStorage.getItem('dataSession'));
+        if (this.state.hccPT !== '' && this.state.analysis !== '' && this.state.observation !== '') {
+            if (this.state.hCC.detail.length == Object.keys(DataResult).length) {
+                this.state.hCC.detail.map(function (item, index) {
+                    switch (item.typeProperty) {
+                        case 'T':
+                            item.result = DataResult[item.idProperty];
+                            item.passTest = DataResultCumple[item.idProperty];
+                            break;
+                        case 'V':
+                            item.resultText = DataResult[item.idProperty];
+                            item.passTest = DataResultCumple[item.idProperty];
+                            break;
                     }
-                });
-                this.state.hCC.hccNorm = nameProviderTMP;
-                this.state.hCC.orderNumber = this.state.orderNumber;
-                this.state.hCC.dateOrder = formattedDate(this.state.receptDate);
-            }
-            this.state.hCC.detail = detailAUX;
-            this.state.hCC.comment = this.state.observation;
-            this.state.hCC.analysis = this.state.analysis;
-            this.state.hCC.asUser = 'oquimbiulco';
-            console.log(this.state.hCC);
-            HCCSave(this.state.hCC, function (data) {
-                switch (data.status) {
-                    case 'OK':
-                        that.showSuccess(data.message);
-                        DataResult = {};
-                        DataResultCumple = {};
-                        that.setState({
-                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
-                            resultsPanel: 'none',
-                            btnGuardarHCC: 'none',
-                            productName: '',
-                            lote: '',
-                        });
-                        GetAllHCCs(function (items) {
-                            console.log(items)
-                            var hccsFiles = items;
-                            that.setState({ hccFiles: items })
-                        })
-
-                        break;
-                    case 'ERROR':
-                        that.showError(data.message);
-                        break;
+                    detailAUX.push(item);
+                })
+                if (this.state.hCC.product.typeProduct == 'PT') {
+                    this.state.hCC.sapCode = this.state.hccPT;
+                    this.state.hCC.of = this.state.hccOF;
+                    this.state.hCC.dateOrder = formattedDate(this.state.productionDate);
+                    if (this.state.hCC.product.typeProductTxt == 'Emulsiones Asfálticas') {
+                        this.state.hCC.referralGuide = this.state.referralGuide;
+                    }
+                } else {
+                    this.state.hCC.sapCode = this.state.hccMP;
+                    this.state.hCC.of = this.state.proveedor;
+                    var nameProviderTMP = undefined;
+                    this.state.hCC.product.providers.map(function (obj) {
+                        if (that.state.proveedor == obj.idProvider) {
+                            nameProviderTMP = obj.nameProvider;
+                        }
+                    });
+                    this.state.hCC.hccNorm = nameProviderTMP;
+                    this.state.hCC.orderNumber = this.state.orderNumber;
+                    this.state.hCC.dateOrder = formattedDate(this.state.receptDate);
                 }
-            })
+                this.state.hCC.detail = detailAUX;
+                this.state.hCC.comment = this.state.observation;
+                this.state.hCC.analysis = this.state.analysis;
+                this.state.hCC.asUser =  sesion.nickName;
+                console.log(this.state.hCC);
+                HCCSave(this.state.hCC, function (data) {
+                    switch (data.status) {
+                        case 'OK':
+                            that.showSuccess(data.message);
+                            DataResult = {};
+                            DataResultCumple = {};
+                            that.setState({
+                                pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
+                                resultsPanel: 'none',
+                                btnGuardarHCC: 'none',
+                                productName: '',
+                                lote: '',  observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined
+                            });
+                            GetAllHCCs(function (items) {
+                                console.log(items)
+                                var hccsFiles = items;
+                                that.setState({ hccFiles: items })
+                            })
 
+                            break;
+                        case 'ERROR':
+                            that.showError(data.message);
+                            break;
+                    }
+                })
+
+            } else {
+                this.showError('Contacte al administrador');
+            }
         } else {
-            this.showError();
+            this.showError('Datos Icompletos');
         }
     }
 
@@ -487,7 +522,7 @@ export class HCC extends Component {
                             <Column field="product.nameProduct" header="Producto" style={{ width: '25%' }} />
                             <Column field="dateCreate" header="Fecha" style={{ width: '10%' }} />
                             <Column field="analysis" header="Análisis" style={{ width: '35%' }} />
-                            <Column header="Certificado" body={this.actionTemplate} style={{ justifyContent: 'center', textAlign:'center' }} />
+                            <Column header="Certificado" body={this.actionTemplate} style={{ justifyContent: 'center', textAlign: 'center' }} />
                         </DataTable>
                         <Dialog visible={this.state.dialogCertificate} header="Generar Certificado" modal={true} style={{ width: '30%' }} footer={dialogFooter} onHide={() => this.setState({ dialogCertificate: false })}>
                             <div className="ui-grid ui-grid-responsive ui-fluid">
@@ -548,17 +583,21 @@ export class HCC extends Component {
                                 </div>
                             </div>
                             <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
-                                <div className='ui-g-4'>
+                                <div className='ui-g-3'>
                                     <label htmlFor="float-input">HCC</label>
                                     <InputText placeholder='Codigo' onChange={(e) => this.setState({ hccPT: e.target.value })} value={this.state.hccPT} />
                                 </div>
-                                <div className='ui-g-4'>
+                                <div className='ui-g-3'>
                                     <label htmlFor="float-input">Orden Fabricación</label>
                                     <InputText placeholder='Número' onChange={(e) => this.setState({ hccOF: e.target.value })} value={this.state.hccOF} />
                                 </div>
-                                <div className='ui-g-4' style={{ display: this.state.fieldReferralGuide }}>
+                                <div className='ui-g-3' style={{ display: this.state.fieldReferralGuide }}>
                                     <label htmlFor="float-input">Guía Remisión</label>
                                     <InputText placeholder='Número' onChange={(e) => this.setState({ referralGuide: e.target.value })} value={this.state.referralGuide} />
+                                </div>
+                                <div className='ui-g-3' style={{ }}>
+                                    <label htmlFor="float-input">Fecha Producción</label>
+                                    <Calendar dateFormat="yy/mm/dd" value={this.state.productionDate} locale={es} showIcon="true" onChange={(e) => this.setState({ productionDate: e.value })}></Calendar>
                                 </div>
                             </div>
                         </Card>
@@ -607,8 +646,11 @@ export class HCC extends Component {
                                 <div className="ui-g-12 ui-md-2 ui-fluid" style={{ textAlign: 'center' }}>
                                     <strong style={{ color: '#ffff' }}>Resultado</strong>
                                 </div>
-                                <div className="ui-g-12 ui-md-3" style={{ textAlign: 'center' }}>
+                                <div className="ui-g-12 ui-md-1" style={{ textAlign: 'center' }}>
                                     <strong style={{ color: '#ffff' }}>Cumple</strong>
+                                </div>
+                                <div className="ui-g-12 ui-md-1" style={{ textAlign: 'center' }}>
+                                    <strong style={{ color: '#ffff' }}>Opción</strong>
                                 </div>
                             </div>
                         </Card>
