@@ -25,6 +25,10 @@ var Transactions = {
     PNCSave:{transactionName: "SetNCP", transactionCode : "TxQQRsetNCP", parameters:{} },
     ClosePNC:{transactionName: "Close NCP", transactionCode: "TxQQRcloseNCP", parameters: {idNCP: 0}},
     GetAllClients:{transactionName: "GetAllClients",transactionCode: "TxQQRGAC",parameters: null},
+    SaveTest:{transactionName: "SaveTest", transactionCode: "TxQQRsaveTest", parameters: {}},
+    GetOnlyPropertyByIdProductAndIdProperty:{transactionName: "GetProductByIdAndPropertyId", transactionCode: "TxQQRgetProductByIdAndPropertyId", parameters: {}},
+    GetProductPropertiesByIdProduct:{transactionName: "GetProductPropertiesById", transactionCode: "TxQQRgetProductPropertiesById", parameters: {}},
+    GetTestsByIdProductBatchNull:{transactionName: "GetTestByBatchNull", transactionCode: "TxQQRgetTestByBatchNull", parameters: {}},
 }
 
 export function productSave(producto, addFunction) {
@@ -126,5 +130,34 @@ export function GenerateCertificate(data, addFunction,){
 export function GetAllClients(addFunction){
     var transaction= Transactions.GetAllClients;
     transaction.parameters=null;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+}
+
+export function SaveTest(data, addFunction){
+    var transaction=Transactions.SaveTest;
+    transaction.parameters={};
+    transaction.parameters=data;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+
+}
+
+export function GetOnlyPropertyByIdProductAndIdProperty(data, addFunction){
+    var transaction=Transactions.GetOnlyPropertyByIdProductAndIdProperty;
+    transaction.parameters={};
+    transaction.parameters=data;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+}
+
+export function GetProductPropertiesByIdProduct(data, addFunction){
+    var transaction=Transactions.GetProductPropertiesByIdProduct;
+    transaction.parameters={};
+    transaction.parameters=data;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+}
+
+export function GetTestByProductIDByBatchNull(data, addFunction){
+    var transaction=Transactions.GetTestsByIdProductBatchNull;
+    transaction.parameters={};
+    transaction.parameters=data;
     SendPostRequestToService(transaction, addFunction,'TxQuality');
 }

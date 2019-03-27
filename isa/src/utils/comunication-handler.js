@@ -6,10 +6,10 @@ import { AjaxPostService, FetchAjax } from './ajax-handler';
 var intentosConexion = 0;
 var Request;
 /* ================= URIs PARA ENVIO DE LA DATA ======================*/
-var security = 'http://192.168.4.18:8440/security/api';
-var quality = 'http://192.168.4.18:8440/qualityQR/api';
-/* var security = 'http://localhost:8440/security/api';
-var quality = 'http://localhost:8440/qualityQR/api'; */
+/* var security = 'http://192.168.4.18:8440/security/api';
+var quality = 'http://192.168.4.18:8440/qualityQR/api'; */
+var security = 'http://localhost:8440/security/api';
+var quality = 'http://localhost:8440/qualityQR/api';
 var rrhh = '';
 var sgc = '';
 
@@ -41,9 +41,11 @@ export function SuccessServiceCall(data, MovilRequest, addFunction) {
     try {
         //var parameters = decryptAES(MovilRequest.parameters, true);
         var responseClaro = undefined;
-        let MessageObj = undefined;
+        var messageObj = data.message;
+        var status= data.status;
         if (data.parameters != null) {
             responseClaro = decryptAES(data.parameters, true);
+           
         } else {
             responseClaro = { message: '', status: '' }
             responseClaro.message = data.message;
@@ -52,7 +54,7 @@ export function SuccessServiceCall(data, MovilRequest, addFunction) {
 
         //var result = JSON.parse(decodeURIComponent(escape(responseClaro)));
         if (addFunction) {
-            addFunction(responseClaro)
+            addFunction(responseClaro,status,messageObj)
             //$.extend(result, { esRegistro: parameters.esRegistro });
             //var isOk = addFunction.handlerError(result);
             // let isOK = errorHandler(responseClaro);

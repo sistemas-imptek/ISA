@@ -36,7 +36,9 @@ export var unidadesMedida=[
 export var periocidad=[
     {label: 'Diaria', value: 'Diaria'},
     {label: 'Mensual', value: 'Mensual'},
+    {label: 'Trimestral', value: 'Trimestral'},
     {label: 'Semestral', value: 'Semestral'},
+    {label: 'Anual', value: 'Anual'},
 ]
 
 /* Variable que contiene catalogo de Proveedores */
@@ -62,5 +64,21 @@ export var cincoMs=[
     {label: 'Medio Ambiente', value: 'Medio Ambiente'},
     {label: 'Maquiaria', value: 'Maquinaria'},
     {label: 'Otro', value: 'Otro'},
+]
+
+/* Variable que contiene los test hasta el Momento */
+export var testList=[
+    {label: 'pH', value: 'PROP_60'},
+    {label: 'Peso por Área', value: 'PROP_14'},
+    {label: 'Viscocidad', value: 'PROP_61'},
+    {label: 'Sujeción de Gránulos', value: 'PROP_25'},
+    {label: 'Punto de Reblandecimiento', value: 'PROP_1'},
+    {label: 'Dimesionales', value: 'Dimensionales'}
+]
+
+/* Variable de desicion SI/ NO */
+export var desicionCMB=[
+    {label: 'Si', value: 'Si'},
+    {label: 'No', value: 'No'}
 ]
 

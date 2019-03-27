@@ -156,7 +156,7 @@ export class HCC extends Component {
         this.growl.show({ severity: 'error', summary: 'Error', detail: message });
     }
     showSuccess(message) {
-        let msg = { severity: 'success', summary: 'Success Message', detail: message };
+        let msg = { severity: 'success', summary: 'Mensaje Exitoso', detail: message };
         this.growl.show(msg);
     }
 
