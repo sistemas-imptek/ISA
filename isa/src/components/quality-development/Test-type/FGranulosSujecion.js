@@ -139,18 +139,18 @@ export class SujecionGranulosForm extends Component {
         var p3 = 0;
         var prom = null;
         var count = 0;
-        if (p1 !== null) {
-            p1 = value.p1;
+        if (value.p1 !== null) {
+            p1 = parseFloat(value.p1);
             count = count + 1;
         }
 
-        if (p2 !== null) {
-            p2 = value.p2;
+        if (value.p2 !== null) {
+            p2 = parseFloat(value.p2);
             count = count + 1;
         }
 
-        if (p3 !== null) {
-            p3 = value.p3;
+        if (value.p3 !== null) {
+            p3 = parseFloat(value.p3);
             count = count + 1;
         }
         if (count !== 0)
@@ -201,11 +201,11 @@ export class SujecionGranulosForm extends Component {
             m3E = parseFloat(value.m3End);
         }
         if (m1I !== 0)
-            p1 = m1I - m1E;
+            p1 = (m1I - m1E).toFixed(2);
         if (m2I !== 0)
-            p2 = m2I - m2E;
+            p2 = (m2I - m2E).toFixed(2);
         if (m3I !== 0)
-            p3 = m3I - m3E;
+            p3 = (m3I - m3E).toFixed(2);
 
         if (p1 !== null)
             this.state.testGranularidad[column.rowIndex]['p1'] = p1;

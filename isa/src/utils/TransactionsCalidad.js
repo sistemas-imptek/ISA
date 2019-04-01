@@ -29,6 +29,7 @@ var Transactions = {
     GetOnlyPropertyByIdProductAndIdProperty:{transactionName: "GetProductByIdAndPropertyId", transactionCode: "TxQQRgetProductByIdAndPropertyId", parameters: {}},
     GetProductPropertiesByIdProduct:{transactionName: "GetProductPropertiesById", transactionCode: "TxQQRgetProductPropertiesById", parameters: {}},
     GetTestsByIdProductBatchNull:{transactionName: "GetTestByBatchNull", transactionCode: "TxQQRgetTestByBatchNull", parameters: {}},
+    SendEmailHCCMP:{transactionName: "SendEmail", transactionCode: "TxQQRsendEmail", parameters: {}},
 }
 
 export function productSave(producto, addFunction) {
@@ -157,6 +158,13 @@ export function GetProductPropertiesByIdProduct(data, addFunction){
 
 export function GetTestByProductIDByBatchNull(data, addFunction){
     var transaction=Transactions.GetTestsByIdProductBatchNull;
+    transaction.parameters={};
+    transaction.parameters=data;
+    SendPostRequestToService(transaction, addFunction,'TxQuality');
+}
+
+export function SendEmailHccMP(data, addFunction){
+    var transaction=Transactions.SendEmailHCCMP;
     transaction.parameters={};
     transaction.parameters=data;
     SendPostRequestToService(transaction, addFunction,'TxQuality');

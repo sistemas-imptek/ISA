@@ -114,7 +114,7 @@ export class ViscosityForm extends Component {
         return this.inputTextEditor(props, 'speedRPM');
     }
     timeEditor(props) {
-        return this.inputTextEditor(props, 'timeViscosidad');
+        return this.inputTextEditor(props, 'timeViscocidad');
     }
     torqueEditor(props) {
         return this.inputTextEditor(props, 'torque');
@@ -312,16 +312,16 @@ export class ViscosityForm extends Component {
                             <Button label="Guardar" icon="fa-save" className="ui-button-success" onClick={() => this.onShowModalTest()} />
                         </div>
                     </Toolbar>
-                    <DataTable value={this.state.testViscosityData} editable={true}>
+                    <DataTable value={this.state.testViscosityData} editable={true} responsive={true}>
                         <Column field='item' style={{ height: 'em', width: '2%' }} />
                         <Column field="dateLog" header="Fecha" editor={this.dateEditor} body={this.renderDate} style={{ height: '3.5em', width: '10%' }} />
                         <Column field="batchTest" header="Lote" editor={this.batchEditor} style={{ height: '3.5em' }} />
-                        <Column field="spindle" header="# Splinde" editor={this.splindeEditor} style={{ height: '3.5em', width: '4%' }} />
+                        <Column field="spindle" header="# Spindle" editor={this.splindeEditor} style={{ height: '3.5em', width: '4%' }} />
                         <Column field="speedRPM" header="Velocidad (RPM)" editor={this.speedEditor} style={{ height: '3.5em' }} />
                         <Column field="timeViscocidad" header="Tiempo (MIN)" editor={this.timeEditor} style={{ height: '3.5em' }} />
                         <Column field="torque" header="Torque (%)" editor={this.torqueEditor} style={{ height: '3.5em' }} />
                         <Column field="temperature" header="Temperatura A(°C)" editor={this.temperatureEditor} style={{ height: '3.5em' }} />
-                        <Column field="resultTest" header="Viscocidad (cps)" editor={this.viscosityEditor} body={this.colorTemplate} style={{ height: '3.5em' }} />
+                        <Column field="resultTest" header="Viscosidad (cps)" editor={this.viscosityEditor} body={this.colorTemplate} style={{ height: '3.5em' }} />
                         <Column field="min" header="Min" style={{ height: '3.5em', width: '5%',backgroundColor: '#dcedc8' }} />
                         <Column field="max" header="Max" style={{ height: '3.5em', width: '5%', backgroundColor: '#dcedc8' }} />
                         <Column field="prommissing" header="Promedia" editor={this.averagEditor} style={{ height: '3.5em' }} />

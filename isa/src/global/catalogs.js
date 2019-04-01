@@ -70,7 +70,7 @@ export var cincoMs=[
 export var testList=[
     {label: 'pH', value: 'PROP_60'},
     {label: 'Peso por Área', value: 'PROP_14'},
-    {label: 'Viscocidad', value: 'PROP_61'},
+    {label: 'Viscosidad', value: 'PROP_61'},
     {label: 'Sujeción de Gránulos', value: 'PROP_25'},
     {label: 'Punto de Reblandecimiento', value: 'PROP_1'},
     {label: 'Dimesionales', value: 'Dimensionales'}

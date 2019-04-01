@@ -207,7 +207,7 @@ export class ResultTest extends Component {
                 <div className="ui-g-12">
                     <div className="card" style={{ backgroundColor: '#d4e157' }}>
                         <Growl ref={(el) => this.growl = el} />
-                         <h1 style={{marginLeft:'10px'}} >RESITRO DE ENSAYOS LABORATORIO DE CALIDAD</h1>
+                         <h1 style={{marginLeft:'10px'}} >REGISTRO DE ENSAYOS LABORATORIO DE CALIDAD</h1>
                         <div className='ui-g form-group ui-fluid'>
                             <div className='ui-g-4'>
                                 <label htmlFor="float-input">Buscar Producto</label>

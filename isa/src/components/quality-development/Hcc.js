@@ -16,12 +16,14 @@ import { InputSwitch } from 'primereact/components/inputswitch/InputSwitch';
 import { Calendar } from 'primereact/components/calendar/Calendar';
 import { Growl } from 'primereact/components/growl/Growl';
 import { RadioButton } from 'primereact/components/radiobutton/RadioButton';
+import { Chips } from 'primereact/components/chips/Chips';
+import { ProgressSpinner } from 'primereact/components/progressspinner/ProgressSpinner';
 
 /* ============  D A T A    C A T A L O G O  S =============== */
 import { periocidad, tipoProducto } from '../../global/catalogs';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients } from '../../utils/TransactionsCalidad';
+import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients, SendEmailHccMP } from '../../utils/TransactionsCalidad';
 
 /* ====================  U T I L S  ======== */
 import { formattedDate } from '../../utils/FormatDate';
@@ -73,8 +75,13 @@ export class HCC extends Component {
             fieldReferralGuide: 'none',
             reloadTextInput: false,
             propertyDetail: [],
-            productionDate: undefined
-
+            productionDate: undefined,
+            visibleModalEmail: false,
+            pathFile: null,
+            sendTo: ['anunez@imptek.com'],
+            sendSubject: 'HCC MP ',
+            sendMessage: 'Estimados. \nAdjunto el documento ',
+            waitModalView: false
         };
         that = this;
         this.generateHCC = this.generateHCC.bind(this);
@@ -92,6 +99,11 @@ export class HCC extends Component {
         this.onRadioChange = this.onRadioChange.bind(this);
         this.findObjCliente = this.findObjCliente.bind(this);
         this.propertyDelete = this.propertyDelete.bind(this);
+        this.closeModalEmail = this.closeModalEmail.bind(this);
+        this.sendEmailHCCMP = this.sendEmailHCCMP.bind(this);
+        this.changeChipsAdd = this.changeChipsAdd.bind(this);
+        this.changeChipsRemove = this.changeChipsRemove.bind(this);
+
     }
 
     /* =============== I N I C I O   F U N C I O N E S ======================= */
@@ -199,9 +211,9 @@ export class HCC extends Component {
     generateHCC() {
         var result = {};
         DataResult = {},
-        DataResultCumple = {};
-        if(this.state.specificationList==''){
-            this.setState({specificationList :'none', hCC: {}})
+            DataResultCumple = {};
+        if (this.state.specificationList == '') {
+            this.setState({ specificationList: 'none', hCC: {} })
         }
         debugger;
         if (this.state.productName != '' && this.state.lote != '') {
@@ -374,21 +386,30 @@ export class HCC extends Component {
                 this.state.hCC.detail = detailAUX;
                 this.state.hCC.comment = this.state.observation;
                 this.state.hCC.analysis = this.state.analysis;
-                this.state.hCC.asUser =  sesion.nickName;
+                this.state.hCC.asUser = sesion.nickName;
                 console.log(this.state.hCC);
-                HCCSave(this.state.hCC, function (data) {
-                    switch (data.status) {
+                this.setState({ waitModalView: true })
+                HCCSave(this.state.hCC, function (data, status, msg) {
+                    that.setState({ waitModalView: false })
+                    switch (status) {
                         case 'OK':
-                            that.showSuccess(data.message);
-                            DataResult = {};
-                            DataResultCumple = {};
-                            that.setState({
-                                pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
-                                resultsPanel: 'none',
-                                btnGuardarHCC: 'none',
-                                productName: '',
-                                lote: '',  observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined
-                            });
+                            that.showSuccess(msg);
+                            if (that.state.hCC.product.typeProduct == 'MP') {
+                                var se = that.state.sendSubject + ' ' + that.state.productName;
+                                var ms = that.state.sendMessage + ' ' + that.state.productName;
+                                that.setState({ visibleModalEmail: true, pathFile: data.filePath, sendSubject: se, sendMessage: ms })
+                            } else {
+                                DataResult = {};
+                                DataResultCumple = {};
+                                that.setState({
+                                    pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
+                                    resultsPanel: 'none',
+                                    btnGuardarHCC: 'none',
+                                    productName: '',
+                                    lote: '', observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined,
+                                });
+                            }
+
                             GetAllHCCs(function (items) {
                                 console.log(items)
                                 var hccsFiles = items;
@@ -397,7 +418,7 @@ export class HCC extends Component {
 
                             break;
                         case 'ERROR':
-                            that.showError(data.message);
+                            that.showError(msg);
                             break;
                     }
                 })
@@ -408,6 +429,68 @@ export class HCC extends Component {
         } else {
             this.showError('Datos Icompletos');
         }
+    }
+
+    changeChipsAdd(e) {
+        debugger
+        var aux = this.state.sendTo;
+        aux.push(e);
+        this.setState({ sendTo: aux });
+    }
+
+    changeChipsRemove(e) {
+        debugger
+        var array = this.state.sendTo
+        var filtered = array.filter(function (value, index, arr) {
+
+            return value != e;
+
+        });
+        this.setState({ sendTo: filtered });
+    }
+
+    /* Metodo para enviar correo a destinatarios. */
+    sendEmailHCCMP() {
+        debugger
+        if (this.state.pathFile !== null) {
+            this.setState({ waitModalView: true })
+            var obj = { contacts: this.state.sendTo.toString(), subject: this.state.sendSubject, filePath: this.state.pathFile, message: this.state.sendMessage }
+            SendEmailHccMP(obj, function (data, status, msg) {
+                that.setState({ waitModalView: false })
+                switch (status) {
+                    case 'OK':
+                        that.showSuccess(msg);
+                        DataResult = {};
+                        DataResultCumple = {};
+                        that.setState({
+                            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
+                            resultsPanel: 'none',
+                            btnGuardarHCC: 'none',
+                            productName: '',
+                            lote: '', observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined,
+                            visibleModalEmail: false, sendTo: ['anunez@imptek.com'], sendMessage: 'Estimados. \nAdjunto el documento', sendSubject: 'HCC MP'
+                        });
+                        break;
+                    case 'ERROR':
+                        that.showSuccess(msg);
+                        break;
+                }
+            })
+        }
+
+    }
+
+    closeModalEmail() {
+        DataResult = {};
+        DataResultCumple = {};
+        that.setState({
+            pnlCabeceraMP: 'none', pnlCabeceraPT: 'none', specificationPanel: 'none', specificationList: 'none', fieldReferralGuide: 'none',
+            resultsPanel: 'none',
+            btnGuardarHCC: 'none',
+            productName: '',
+            lote: '', observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined,
+            visibleModalEmail: false,
+        });
     }
 
     /* Metodo para generar Certificado */
@@ -466,6 +549,12 @@ export class HCC extends Component {
         });
     }
     render() {
+        const footer = (
+            <div>
+                <Button label="Aceptar" icon="fa-check" className="ui-button-primary" onClick={() => this.sendEmailHCCMP()} />
+                <Button label="Cancelar" icon="fa-close" onClick={() => this.closeModalEmail()} className="ui-button-danger" />
+            </div>
+        );
         let es = {
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -484,6 +573,16 @@ export class HCC extends Component {
         </div>;
         return (
             <div>
+                <Dialog visible={this.state.waitModalView} style={{ width: '20vw' }} modal={true} showHeader={false} closeOnEscape={false} onHide={() => this.setState({ waitModalView: false })}>
+                    <div className="ui-grid ui-grid-responsive ui-fluid">
+                        <div className="ui-grid-row" style={{ marginRight: '10px' }}>
+                            <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="8" fill="#EEEEEE" animationDuration="4s" />
+                        </div>
+                        <div className="ui-grid-row" style={{ textAlign: 'center', justifyContent: 'center', marginBottom: '10px', marginTop: '15px' }}>
+                            <span style={{ fontWeight: 'bold', textAlign: 'center' }}>Espere por favor... !</span>
+                        </div>
+                    </div>
+                </Dialog>
                 <Growl ref={(el) => this.growl = el} />
                 <Button label='Guardar' icon='fa fa-save' onClick={this.saveHCC} style={{
                     display: this.state.btnGuardarHCC,
@@ -595,7 +694,7 @@ export class HCC extends Component {
                                     <label htmlFor="float-input">Guía Remisión</label>
                                     <InputText placeholder='Número' onChange={(e) => this.setState({ referralGuide: e.target.value })} value={this.state.referralGuide} />
                                 </div>
-                                <div className='ui-g-3' style={{ }}>
+                                <div className='ui-g-3' style={{}}>
                                     <label htmlFor="float-input">Fecha Producción</label>
                                     <Calendar dateFormat="yy/mm/dd" value={this.state.productionDate} locale={es} showIcon="true" onChange={(e) => this.setState({ productionDate: e.value })}></Calendar>
                                 </div>
@@ -667,7 +766,33 @@ export class HCC extends Component {
                                 </div>
                             </div>
                         </Card>
+                        <Dialog header="Envío Correo Electrónico" visible={this.state.visibleModalEmail} style={{ width: '40vw' }} footer={footer} modal={true} onHide={() => this.setState({ visibleModalEmail: false })}>
+                            <div className="ui-grid ui-grid-responsive ui-fluid">
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Para</label></div>
+                                    <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                        <Chips value={this.state.sendTo} onAdd={(e) => this.changeChipsAdd(e.value)} onRemove={(e) => this.changeChipsRemove(e.value)}></Chips>
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Asunto</label></div>
+                                    <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                        <InputText onChange={(e) => this.setState({ sendSubject: e.target.value })} value={this.state.sendSubject} />
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row">
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Mensaje</label></div>
+                                    <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                        <InputTextarea rows={5} value={this.state.sendMessage} onChange={(e) => this.setState({ sendMessage: e.target.value })} />
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row">
+                                    <div>{this.state.messageEmail}</div>
+                                </div>
+                            </div>
+                        </Dialog>
                     </TabPanel>
+
                 </TabView>
 
             </div>
