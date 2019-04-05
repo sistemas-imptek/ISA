@@ -82,3 +82,19 @@ export var desicionCMB=[
     {label: 'No', value: 'No'}
 ]
 
+
+/* Variable de acronimo */
+export var abbreviation=[
+    {label: 'Sr', value: 'Sr'},
+    {label: 'Sta', value: 'Sta'},
+    {label: 'Sra', value: 'Sra'},
+    {label: 'Dr', value: 'Dr'},
+    {label: 'Dra', value: 'Dra'},
+    {label: 'Arq', value: 'Arq'},
+    {label: 'Ing', value: 'Ing'},
+    {label: 'Msc', value: 'Msc'},
+    {label: 'Mg', value: 'Mg'},
+    {label: 'Abg', value: 'Abg'},
+    {label: 'Lic', value: 'Lic'},
+    {label: 'Otro', value: 'Otro'}
+]

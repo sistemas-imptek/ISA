@@ -20,10 +20,10 @@ import { Chips } from 'primereact/components/chips/Chips';
 import { ProgressSpinner } from 'primereact/components/progressspinner/ProgressSpinner';
 
 /* ============  D A T A    C A T A L O G O  S =============== */
-import { periocidad, tipoProducto } from '../../global/catalogs';
+import { periocidad, tipoProducto, abbreviation } from '../../global/catalogs';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients, SendEmailHccMP } from '../../utils/TransactionsCalidad';
+import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients, SendEmail } from '../../utils/TransactionsCalidad';
 
 /* ====================  U T I L S  ======== */
 import { formattedDate } from '../../utils/FormatDate';
@@ -77,11 +77,18 @@ export class HCC extends Component {
             propertyDetail: [],
             productionDate: undefined,
             visibleModalEmail: false,
+            visibleModalEmail2: false,
             pathFile: null,
             sendTo: ['anunez@imptek.com'],
             sendSubject: 'HCC MP ',
             sendMessage: 'Estimados. \nAdjunto el documento ',
-            waitModalView: false
+            waitModalView: false,
+            abbreValue: undefined,
+            otroAbrebbation: undefined,
+            fieldAbbrebation: true,
+            msgError: '',
+            shMsgError: 'none',
+
         };
         that = this;
         this.generateHCC = this.generateHCC.bind(this);
@@ -103,6 +110,8 @@ export class HCC extends Component {
         this.sendEmailHCCMP = this.sendEmailHCCMP.bind(this);
         this.changeChipsAdd = this.changeChipsAdd.bind(this);
         this.changeChipsRemove = this.changeChipsRemove.bind(this);
+        this.onAbbrevationChange = this.onAbbrevationChange.bind(this);
+        this.closeModalCertificate = this.closeModalCertificate.bind(this);
 
     }
 
@@ -186,6 +195,13 @@ export class HCC extends Component {
         debugger;
         DataResultCumple[id] = e.value;
         this.setState({ reloadTextInput: true });
+    }
+
+    onAbbrevationChange(event) {
+        if (event.value == 'Otro')
+            this.setState({ abbreValue: event.value, fieldAbbrebation: false });
+        else
+            this.setState({ abbreValue: event.value, fieldAbbrebation: true });
     }
     /* Metodo para onRadioButton hccTYpe */
     onRadioChange(event) {
@@ -290,6 +306,12 @@ export class HCC extends Component {
     showDialogCertifiacte(data) {
         this.setState({
             dialogCertificate: true, selectedHCC: data
+        })
+    }
+
+    closeModalCertificate() {
+        this.setState({
+            dialogCertificate: false, clientName: undefined, abbreValue: undefined, otroAbrebbation: undefined, shMsgError: 'none', msgError: ''
         })
     }
 
@@ -455,7 +477,7 @@ export class HCC extends Component {
         if (this.state.pathFile !== null) {
             this.setState({ waitModalView: true })
             var obj = { contacts: this.state.sendTo.toString(), subject: this.state.sendSubject, filePath: this.state.pathFile, message: this.state.sendMessage }
-            SendEmailHccMP(obj, function (data, status, msg) {
+            SendEmail(obj, function (data, status, msg) {
                 that.setState({ waitModalView: false })
                 switch (status) {
                     case 'OK':
@@ -490,28 +512,39 @@ export class HCC extends Component {
             productName: '',
             lote: '', observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined,
             visibleModalEmail: false,
+            clientName:undefined, abbreValue: undefined
         });
     }
 
     /* Metodo para generar Certificado */
     generateCertificate() {
-        var objAux = { hccHead: { sapCode: '' }, clientImptek: { idClient: undefined }, email: '' };
+        var objAux = { hccHead: { sapCode: '' }, clientImptek: { idClient: undefined, nameClient: undefined }, email: '', clientPrint: '' };
         objAux.clientImptek.idClient = this.findObjCliente(this.state.clientName);
+        objAux.clientImptek.nameClient=this.state.clientName
         objAux.hccHead.sapCode = this.state.selectedHCC.sapCode;
         objAux.email = this.state.email;
-        GenerateCertificate(objAux, function (data) {
-            switch (data.status) {
-                case 'OK':
-                    that.showSuccess(data.message);
-                    that.setState({
-                        dialogCertificate: false, cliente: '', order: '',
-                    });
-                    break;
-                case 'ERROR':
-                    that.showError(data.message);
-                    break;
-            }
-        })
+        objAux.clientPrint = this.state.abbreValue + '.' + ' ' + this.state.clientName;
+        if ((this.state.abbreValue !== undefined) & (this.state.clientName !== undefined)) {
+            this.setState({ waitModalView: true })
+            GenerateCertificate(objAux, function (data, status, msg) {
+                that.setState({ waitModalView: false })
+                switch (status) {
+                    case 'OK':
+                        that.showSuccess(msg);
+                        var temp = 'Estimado\n' + that.state.abbreValue + '. ' + that.state.clientName;
+                        that.setState({
+                            dialogCertificate: false, cliente: '', order: '', visibleModalEmail: true, sendTo: [], sendMessage: temp, sendSubject: 'Certificado de Calidad',
+                            pathFile: data.filePath
+                        });
+                        break;
+                    case 'ERROR':
+                        that.showError(msg);
+                        break;
+                }
+            })
+        } else {
+            this.setState({ msgError: 'Error debe ingresar todos los campos', shMsgError: '' })
+        }
     }
     findObjCliente(name) {
         var idclienteTMP = undefined;
@@ -568,7 +601,7 @@ export class HCC extends Component {
             <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Buscar" size="35" />
         </div>
         let dialogFooter = <div className="ui-dialog-buttonpane ui-helper-clearfix">
-            <Button className='ui-button-danger' icon="fa fa-close" label="Cancelar" onClick={() => this.setState({ dialogCertificate: false })} />
+            <Button className='ui-button-danger' icon="fa fa-close" label="Cancelar" onClick={this.closeModalCertificate} />
             <Button className='ui-button-success' label="Aceptar" icon="fa-check" onClick={this.generateCertificate} />
         </div>;
         return (
@@ -580,6 +613,31 @@ export class HCC extends Component {
                         </div>
                         <div className="ui-grid-row" style={{ textAlign: 'center', justifyContent: 'center', marginBottom: '10px', marginTop: '15px' }}>
                             <span style={{ fontWeight: 'bold', textAlign: 'center' }}>Espere por favor... !</span>
+                        </div>
+                    </div>
+                </Dialog>
+                <Dialog header="Envío Correo Electrónico" visible={this.state.visibleModalEmail} style={{ width: '40vw' }} footer={footer} modal={true} onHide={() => this.setState({ visibleModalEmail: false })}>
+                    <div className="ui-grid ui-grid-responsive ui-fluid">
+                        <div className="ui-grid-row">
+                            <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Para</label></div>
+                            <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                <Chips value={this.state.sendTo} onAdd={(e) => this.changeChipsAdd(e.value)} onRemove={(e) => this.changeChipsRemove(e.value)}></Chips>
+                            </div>
+                        </div>
+                        <div className="ui-grid-row">
+                            <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Asunto</label></div>
+                            <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                <InputText onChange={(e) => this.setState({ sendSubject: e.target.value })} value={this.state.sendSubject} />
+                            </div>
+                        </div>
+                        <div className="ui-grid-row">
+                            <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Mensaje</label></div>
+                            <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
+                                <InputTextarea rows={5} value={this.state.sendMessage} onChange={(e) => this.setState({ sendMessage: e.target.value })} />
+                            </div>
+                        </div>
+                        <div className="ui-grid-row">
+                            <div>{this.state.messageEmail}</div>
                         </div>
                     </div>
                 </Dialog>
@@ -623,25 +681,38 @@ export class HCC extends Component {
                             <Column field="analysis" header="Análisis" style={{ width: '35%' }} />
                             <Column header="Certificado" body={this.actionTemplate} style={{ justifyContent: 'center', textAlign: 'center' }} />
                         </DataTable>
-                        <Dialog visible={this.state.dialogCertificate} header="Generar Certificado" modal={true} style={{ width: '30%' }} footer={dialogFooter} onHide={() => this.setState({ dialogCertificate: false })}>
+                        <Dialog visible={this.state.dialogCertificate} header="Generar Certificado" modal={true} style={{ width: '35%' }} footer={dialogFooter} onHide={this.closeModalCertificate}>
                             <div className="ui-grid ui-grid-responsive ui-fluid">
-                                <div className="ui-grid-row">
-                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Cliente</label></div>
-                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
+                                <div className="ui-grid-row" style={{ marginBottom: '18px' }}>
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Profesión</label></div>
+                                    <div className="ui-grid-col-3" style={{ padding: '0px 10px' }}>
+                                        <Dropdown value={this.state.abbreValue} options={abbreviation} onChange={this.onAbbrevationChange} placeholder="Seleccione" />
+                                    </div>
+                                    <div className="ui-grid-col-6" style={{ padding: '0px 10px' }}>
+                                        <InputText onChange={(e) => this.setState({ otroAbrebbation: e.target.value })} value={this.state.otroAbrebbation} disabled={this.state.fieldAbbrebation} />
+                                    </div>
+                                </div>
+                                <div className="ui-grid-row" style={{ marginBottom: '18px' }}>
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Cliente</label></div>
+                                    <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
                                         <AutoComplete minLength={1} placeholder="Nombre" id="acAdvanced"
                                             suggestions={this.state.filteredClients} completeMethod={this.filterClients.bind(this)} value={this.state.clientName}
                                             onChange={this.onClientValueChange.bind(this)} onDropdownClick={this.handleDropdownClickClientFind.bind(this)}
                                         />
                                     </div>
                                 </div>
-                                <div className="ui-grid-row">
-                                    <div className="ui-grid-col-4" style={{ padding: '4px 10px' }}><label htmlFor="year">Correo</label></div>
-                                    <div className="ui-grid-col-8" style={{ padding: '4px 10px' }}>
+                                <div className="ui-grid-row" style={{ marginBottom: '25px' }}>
+                                    <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Correo</label></div>
+                                    <div className="ui-grid-col-9" style={{ padding: '4px 10px' }}>
                                         <InputText onChange={(e) => this.setState({ email: e.target.value })} value={this.state.email} />
                                     </div>
                                 </div>
                             </div>
+                            <div className="ui-grid-row" style={{ display: this.state.shMsgError }}>
+                                <div style={{ color: '#e53935', textAlign: 'center' }}>{this.state.msgError}</div>
+                            </div>
                         </Dialog>
+
                     </TabPanel>
                     <TabPanel header="HCC" leftIcon="fa fa-product-hunt">
                         <Card style={{ backgroundColor: '#d4e157' }}>
@@ -766,7 +837,7 @@ export class HCC extends Component {
                                 </div>
                             </div>
                         </Card>
-                        <Dialog header="Envío Correo Electrónico" visible={this.state.visibleModalEmail} style={{ width: '40vw' }} footer={footer} modal={true} onHide={() => this.setState({ visibleModalEmail: false })}>
+                        {/* <Dialog header="Envío Correo Electrónico" visible={this.state.visibleModalEmail} style={{ width: '40vw' }} footer={footer} modal={true} onHide={() => this.setState({ visibleModalEmail: false })}>
                             <div className="ui-grid ui-grid-responsive ui-fluid">
                                 <div className="ui-grid-row">
                                     <div className="ui-grid-col-3" style={{ padding: '4px 10px' }}><label htmlFor="year">Para</label></div>
@@ -790,7 +861,7 @@ export class HCC extends Component {
                                     <div>{this.state.messageEmail}</div>
                                 </div>
                             </div>
-                        </Dialog>
+                        </Dialog> */}
                     </TabPanel>
 
                 </TabView>
