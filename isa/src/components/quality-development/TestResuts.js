@@ -27,6 +27,8 @@ import { ViscosityForm } from './Test-type/FViscosity-test';
 import { AWeightForm } from './Test-type/FPesoXArea-test';
 import { SujecionGranulosForm } from './Test-type/FGranulosSujecion';
 import { DimensionalesForm } from './Test-type/FDimensionales-test';
+import { ReadTestPFForm } from './Test-type/FReadTestPF';
+
 
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
 var that;
@@ -78,8 +80,17 @@ export class ResultTest extends Component {
 
     /* Método Evento listas deplegables */
     onDropdownChangeTest(event) {
-        this.setState({ test: event.value });
-        this.getInformationProperty(event.value);
+        var template = null
+        switch (event.value) {
+            case 'LeerEnsayos':
+                template=<ReadTestPFForm/>
+                break;
+            default:
+                this.getInformationProperty(event.value);
+                break;
+        }
+        this.setState({ test: event.value, componentRender: template });
+
     }
 
     /* Método para Mostrar mensajes de Información */
@@ -190,6 +201,8 @@ export class ResultTest extends Component {
                 return (<ReblandecimientoForm />);
             case 'Dimensionales':
                 return (<DimensionalesForm />);
+            case 'LeerEnsayos':
+                return (<ReadTestPFForm />);
             default:
                 return (<div></div>);
 
@@ -207,7 +220,7 @@ export class ResultTest extends Component {
                 <div className="ui-g-12">
                     <div className="card" style={{ backgroundColor: '#d4e157' }}>
                         <Growl ref={(el) => this.growl = el} />
-                         <h1 style={{marginLeft:'10px'}} >REGISTRO DE ENSAYOS LABORATORIO DE CALIDAD</h1>
+                        <h1 style={{ marginLeft: '10px' }} >REGISTRO DE ENSAYOS LABORATORIO DE CALIDAD</h1>
                         <div className='ui-g form-group ui-fluid'>
                             <div className='ui-g-4'>
                                 <label htmlFor="float-input">Buscar Producto</label>
@@ -239,4 +252,15 @@ export function getPropertyInformation() {
 
 export function setnewTest() {
     that.setState({ test: null, testEnabled: false, nameProduct: null, componentRender: undefined });
+}
+
+export function getProductFound(){
+    var productF=null;
+    that.state.products.map(function (obj) {
+        if (obj.nameProduct === that.state.productName) {
+            productF = obj;
+        }
+    })
+
+    return productF
 }

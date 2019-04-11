@@ -73,7 +73,8 @@ export var testList=[
     {label: 'Viscosidad', value: 'PROP_61'},
     {label: 'Sujeción de Gránulos', value: 'PROP_25'},
     {label: 'Punto de Reblandecimiento', value: 'PROP_1'},
-    {label: 'Dimesionales', value: 'Dimensionales'}
+    {label: 'Dimesionales', value: 'Dimensionales'},
+    {label: 'Leer Ensayos', value: 'LeerEnsayos'}
 ]
 
 /* Variable de desicion SI/ NO */

@@ -201,6 +201,8 @@ export class App extends Component {
             var menuItem={label:'', icon:'', command:()=>{window.location.hash=''}};
             menuItem.label=obj.itemDescription;
             menuItem.icon= obj.iconMenu;
+            if(obj.ref !== null)
+                menuItem.command=()=>{window.location.hash=obj.ref}
             
             if(obj.subMenus.length !=0 ||obj.subMenus.length != undefined ){
                 menuItem.items=[];
