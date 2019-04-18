@@ -18,7 +18,7 @@ import { testList, desicionCMB } from '../../../global/catalogs';
 import { formattedDate, formattedDateAndHour, formattedHour, formattedStringtoDate } from '../../../utils/FormatDate';
 
 /* ====================  T R A N S A C T I O N S ======== */
-import { SaveTest } from '../../../utils/TransactionsCalidad';
+import { SaveTest, GetTestByProductIDByBatchNull } from '../../../utils/TransactionsCalidad';
 
 /* =================== FUNCIONES HEREDADAS ============= */
 import { getPropertyInformation, setnewTest } from '../TestResuts';
@@ -300,6 +300,16 @@ export class ReblandecimientoForm extends Component {
 
     componentWillMount() {
         var pp = getPropertyInformation();
+        if (pp.productType == 'MP') {
+            var tt = { idProduct: pp.productId, idProperty: pp.propertyId }
+            GetTestByProductIDByBatchNull(tt, function (items, status, msg) {
+                if (status == 'OK') {
+                    that.dataTratamient(items);
+                    that.setState({ testReblandecimiento: items })
+                }
+
+            })
+        }
         var addMinMax = this.state.testReblandecimiento.map(function (o) {
             o.min = pp.propertyMin;
             o.max = pp.propertyMax;
