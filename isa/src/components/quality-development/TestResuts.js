@@ -28,6 +28,7 @@ import { AWeightForm } from './Test-type/FPesoXArea-test';
 import { SujecionGranulosForm } from './Test-type/FGranulosSujecion';
 import { DimensionalesForm } from './Test-type/FDimensionales-test';
 import { ReadTestPFForm } from './Test-type/FReadTestPF';
+import { IngresoMPForm } from './Test-type/FIngresoMP';
 
 
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
@@ -83,7 +84,7 @@ export class ResultTest extends Component {
         var template = null
         switch (event.value) {
             case 'LeerEnsayos':
-                template=<ReadTestPFForm/>
+                template = <ReadTestPFForm />
                 break;
             default:
                 this.getInformationProperty(event.value);
@@ -112,59 +113,88 @@ export class ResultTest extends Component {
             }
         })
         if (productF !== null) {
-            if (propertyIdValue !== 'Dimensionales') {
-                var obj = { idProduct: productF.idProduct, properties: [{ propertyList: { idProperty: propertyIdValue } }] };
-                GetOnlyPropertyByIdProductAndIdProperty(obj, function (data, status, msg) {
-                    debugger
-                    console.log(data);
-                    switch (status) {
-                        case 'OK':
-                            that.showSuccess(msg);
-                            var CRTMP = that.renderComponenteForTest();
-                            that.setState({ componentRender: CRTMP, propertyInformation: data });
-                            break;
-                        case 'ERROR':
-                            that.showError(msg);
-                            that.setState({ componentRender: null, propertyInformation: null });
-                            break;
-                        case 'INFO':
-                            that.setState({ componentRender: null, propertyInformation: null });
-                            that.showError(msg);
-                            break;
-                        default:
-                            console.log(data);
-                            break;
-                    }
-                })
 
-            } else {
-                var obj = { idProduct: productF.idProduct };
-                GetProductPropertiesByIdProduct(obj, function (data, status, msg) {
-                    debugger
-                    console.log(data);
-                    switch (status) {
-                        case 'OK':
-                            that.showSuccess(msg);
-                            var CRTMP = that.renderComponenteForTest();
-                            that.setState({ componentRender: CRTMP, propertyInformation: data });
-                            break;
-                        case 'ERROR':
-                            that.showError(msg);
-                            that.setState({ componentRender: null, propertyInformation: null });
-                            break;
-                        case 'INFO':
-                            that.setState({ componentRender: null, propertyInformation: null });
-                            that.showError(msg);
-                            break;
-                        default:
+            switch (propertyIdValue) {
+                case 'Dimensionales':
+                    var obj = { idProduct: productF.idProduct };
+                    GetProductPropertiesByIdProduct(obj, function (data, status, msg) {
+                        console.log(data);
+                        switch (status) {
+                            case 'OK':
+                                that.showSuccess(msg);
+                                var CRTMP = that.renderComponenteForTest();
+                                that.setState({ componentRender: CRTMP, propertyInformation: data });
+                                break;
+                            case 'ERROR':
+                                that.showError(msg);
+                                that.setState({ componentRender: null, propertyInformation: null });
+                                break;
+                            case 'INFO':
+                                that.setState({ componentRender: null, propertyInformation: null });
+                                that.showError(msg);
+                                break;
+                            default:
+                                console.log(data);
+                                break;
+                        }
+                    })
+                    break;
+                case 'IngresoMP':
+                    if (productF.typeProduct == 'MP') {
+                        var obj = { idProduct: productF.idProduct };
+                        GetProductPropertiesByIdProduct(obj, function (data, status, msg) {
+                            debugger
                             console.log(data);
-                            break;
+                            switch (status) {
+                                case 'OK':
+                                    that.showSuccess(msg);
+                                    var CRTMP = that.renderComponenteForTest();
+                                    that.setState({ componentRender: CRTMP, propertyInformation: data });
+                                    break;
+                                case 'ERROR':
+                                    that.showError(msg);
+                                    that.setState({ componentRender: null, propertyInformation: null });
+                                    break;
+                                case 'INFO':
+                                    that.setState({ componentRender: null, propertyInformation: null });
+                                    that.showError(msg);
+                                    break;
+                                default:
+                                    console.log(data);
+                                    break;
+                            }
+                        })
+                    } else {
+                        this.showError('Propiedad no disponible para Producto Terminado');
                     }
-                })
+                    break;
+                default:
+                    var obj = { idProduct: productF.idProduct, properties: [{ propertyList: { idProperty: propertyIdValue } }] };
+                    GetOnlyPropertyByIdProductAndIdProperty(obj, function (data, status, msg) {
+                        console.log(data);
+                        switch (status) {
+                            case 'OK':
+                                that.showSuccess(msg);
+                                var CRTMP = that.renderComponenteForTest();
+                                that.setState({ componentRender: CRTMP, propertyInformation: data });
+                                break;
+                            case 'ERROR':
+                                that.showError(msg);
+                                that.setState({ componentRender: null, propertyInformation: null });
+                                break;
+                            case 'INFO':
+                                that.setState({ componentRender: null, propertyInformation: null });
+                                that.showError(msg);
+                                break;
+                            default:
+                                console.log(data);
+                                break;
+                        }
+                    })
+                    break;
             }
-
         } else {
-            console.log('Producto no encontrado')
+            this.showError('Producto no encontrado');
         }
 
     }
@@ -186,7 +216,6 @@ export class ResultTest extends Component {
 
     /* Método para Renderizar el componente que se necesita */
     renderComponenteForTest() {
-        debugger
         console.log('IngresoRENDER')
         switch (this.state.test) {
             case 'PROP_60':
@@ -203,6 +232,8 @@ export class ResultTest extends Component {
                 return (<DimensionalesForm />);
             case 'LeerEnsayos':
                 return (<ReadTestPFForm />);
+            case 'IngresoMP':
+                return (<IngresoMPForm />);
             default:
                 return (<div></div>);
 
@@ -254,8 +285,8 @@ export function setnewTest() {
     that.setState({ test: null, testEnabled: false, nameProduct: null, componentRender: undefined });
 }
 
-export function getProductFound(){
-    var productF=null;
+export function getProductFound() {
+    var productF = null;
     that.state.products.map(function (obj) {
         if (obj.nameProduct === that.state.productName) {
             productF = obj;
@@ -263,4 +294,19 @@ export function getProductFound(){
     })
 
     return productF
+}
+
+export function getProviders() {
+    var providersF = [];
+    if (that.state.propertyInformation.providers !== undefined) {
+        that.state.propertyInformation.providers.map(function (obj) {
+            var items = { label: null, value: null }
+            items.label = obj.nameProvider;
+            items.value = obj.idProvider;
+            providersF.push(items);
+        })
+
+    }
+
+    return providersF;
 }

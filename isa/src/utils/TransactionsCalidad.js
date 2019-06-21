@@ -31,6 +31,12 @@ var Transactions = {
     GetTestsByIdProductBatchNull: { transactionName: "GetTestByBatchNull", transactionCode: "TxQQRgetTestByBatchNull", parameters: {} },
     SendEmail: { transactionName: "SendEmail", transactionCode: "TxQQRsendEmail", parameters: {} },
     ReadTestPlaneFile: { transactionName: "ReadTestPF", transactionCode: "TxQQRReadTestPF", parameters: {} },
+    GetTestByBatchAndIdProduct: { transactionName: "GetTestByBatchAndIdProduct", transactionCode: "TxQQRgetTestByBatchAndIdProduct", parameters: {} },
+    SaveComplaintMP: { transactionName: "SaveComplaint", transactionCode: "TxQQRsaveComplaint", parameters: {} },
+    GetAllComplaint: { transactionName: "GetAllComplaint", transactionCode: "TxQQRgetAllComplaint", parameters: {} },
+    SaveProblem: { transactionName: "SaveProblem", transactionCode: "TxQQRsaveProblem", parameters: {} },
+    GenerateReportComplaint:{ transactionName: "GenerateReportComplaint", transactionCode: "TxQQRgenerateReportComplaint", parameters: {}},
+
 }
 
 export function productSave(producto, addFunction) {
@@ -173,6 +179,40 @@ export function SendEmail(data, addFunction) {
 
 export function ReadTestPlaneFile(data, addFunction) {
     var transaction = Transactions.ReadTestPlaneFile;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function GetTestBatchAndIpProduct(data, addFunction) {
+    var transaction = Transactions.GetTestByBatchAndIdProduct;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function SaveComplaintRMP(data, addFunction) {
+    var transaction = Transactions.SaveComplaintMP;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function GetAllComplaintsRMP(addFunction) {
+    var transaction = Transactions.GetAllComplaint;
+    transaction.parameters = {};
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function SaveProblemRMP(data, addFunction) {
+    var transaction = Transactions.SaveProblem;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function GenerateReportComplaint(data, addFunction) {
+    var transaction = Transactions.GenerateReportComplaint;
     transaction.parameters = {};
     transaction.parameters = data;
     SendPostRequestToService(transaction, addFunction, 'TxQuality');

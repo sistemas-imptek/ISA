@@ -6,10 +6,10 @@ import { AjaxPostService, FetchAjax } from './ajax-handler';
 var intentosConexion = 0;
 var Request;
 /* ================= URIs PARA ENVIO DE LA DATA ======================*/
-/* var security = 'http://192.168.4.18:8440/security/api';
-var quality = 'http://192.168.4.18:8440/qualityQR/api'; */
-var security = 'http://localhost:8440/security/api';
-var quality = 'http://localhost:8440/qualityQR/api';
+var security = 'http://192.168.4.18:8440/security/api';
+var quality = 'http://192.168.4.18:8440/qualityQR/api';
+/* var security = 'http://localhost:8440/security/api';
+var quality = 'http://localhost:8440/qualityQR/api'; */
 var rrhh = '';
 var sgc = '';
 
@@ -25,7 +25,7 @@ function decide(tx) {
 }
 
 export function SendPostRequestToService(WebRequest, addFunction, typeTx, platForm) {
-    debugger;
+    
     if(WebRequest.parameters!=null){
         WebRequest.parameters = encryptAES(WebRequest.parameters);
     }    
@@ -37,7 +37,7 @@ export function SendPostRequestToService(WebRequest, addFunction, typeTx, platFo
 }
 
 export function SuccessServiceCall(data, MovilRequest, addFunction) {
-    debugger;
+   
     try {
         //var parameters = decryptAES(MovilRequest.parameters, true);
         var responseClaro = undefined;

@@ -1,8 +1,8 @@
 {
     "data": [
-        {"codigo": 1, "nombre": "Alumban", "tipo": "Producto Terminado", "familia":"Lámina", "codigoSAP": "219874"},
-        {"codigo": 2, "nombre": "Super K", "tipo": "Producto Terminado","familia":"Lámina", "codigoSAP": "58745"},
-        {"codigo": 3, "nombre": "Revestimiento", "tipo": "Producto Terminado","familia":"Líquido", "codigoSAP": "758"},
-        {"codigo": 4, "nombre": "Super Acril", "tipo": "Materia Prima", "familia":"Líquido","codigoSAP": "31ff"}
+        {"vin":"a1653d4d","brand":"Volkswagen","year":1998,"color":"White"},
+        {"vin":"ddeb9b10","brand":"Mercedes","year":1985,"color":"Green"},
+        {"vin":"d8ebe413","brand":"Jaguar","year":1979,"color":"Silver"},
+        {"vin":"aab227b7","brand":"Audi","year":1970,"color":"Black"},
     ]
 }
