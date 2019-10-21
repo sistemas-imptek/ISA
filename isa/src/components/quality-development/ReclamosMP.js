@@ -18,8 +18,9 @@ import { InputTextarea } from 'primereact/components/inputtextarea/InputTextarea
 import { Accordion, AccordionTab } from 'primereact/components/accordion/Accordion';
 import { AutoComplete } from 'primereact/components/autocomplete/AutoComplete';
 
-/* ============  L I B R A R I E S    ===================== */
+/* ============  L I B R A R I E S   S U B  C O M P O N E N T S   ===================== */
 import { Email, setParamsSendEmail } from '../Email/cemail';
+import { PW, show_msgPW, hide_msgPW } from '../../global/SubComponents/PleaseWait'; //Sub-Componente "Espere Por favor..."
 
 /* ============  D A T A    C A T A L O G O  S =============== */
 import { mpEntry, placesRMP, unidadesMedida } from '../../global/catalogs';
@@ -32,6 +33,7 @@ import { formattedDate, formattedDateAndHour, formattedHour, formattedStringtoDa
 
 var that;
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
+//var directorio=require("D:/ISA/FilesRepository/img");
 export class Complaint extends Component {
 
     constructor() {
@@ -65,6 +67,8 @@ export class Complaint extends Component {
             selectedEA: null,
             newCar: false,
             imageC: null,
+            imageCName: null,
+            imageCExten: null,
             viewModalImg: false,
             srcImageVM: '',
             datePAPC: null,
@@ -113,6 +117,7 @@ export class Complaint extends Component {
         this.addComplaint = this.addComplaint.bind(this);
         this.templateState = this.templateState.bind(this);
         this.closeComplaintAfirmativo = this.closeComplaintAfirmativo.bind(this);
+        this.validateTypeUser = this.validateTypeUser.bind(this);
 
     }
 
@@ -150,7 +155,7 @@ export class Complaint extends Component {
             this.state.products.map(function (o) {
                 if (o.nameProduct == e.value) {
                     idProductTmp = o.idProduct;
-                    if (o.providers.length != 0) {
+                    if (o.providers!== undefined) {
                         o.providers.map(function (p) {
                             let pTmp = { label: '', value: '' }
                             pTmp.label = p.nameProvider;
@@ -201,9 +206,12 @@ export class Complaint extends Component {
 
     /* Metodo template Tabla Reclamos MP, */
     templateViews(rowData, column) {
-        return (<div>
-            <Button type="button" label="Ver" icon='fa fa-tasks' style={{ width: '' }} className="ui-button-success" onClick={() => this.showDetails(rowData, 'details')}></Button>
-        </div>);
+        if (rowData.pictureStringB64 !== null || rowData.pictureStringB64 !== '') {
+            return (<div>
+                <Button type="button" label="Ver" icon='fa fa-tasks' style={{ width: '' }} className="ui-button-success" onClick={() => this.showDetails(rowData, 'details')}></Button>
+            </div>);
+        }
+
     }
 
     /* Metod para visulizar la imagen en un acolumna */
@@ -221,15 +229,22 @@ export class Complaint extends Component {
     /* Método para visualizar el boton e la columna estado */
     templateState(rowData, column) {
         debugger
-        switch (rowData.state) {
-            case 'Abierto':
-                return (
-                    <Button type="button" label="Abierto" className="ui-button-warning" onClick={() => this.closeComplaint(rowData)}></Button>
-                )
-            case 'Cerrado':
-                return (
-                    <spam>Cerrado</spam>
-                );
+        var vtu = this.validateTypeUser();
+        if (vtu == 'none') {
+            return (
+                <spam>{rowData.state}</spam>
+            );
+        } else {
+            switch (rowData.state) {
+                case 'Abierto':
+                    return (
+                        <Button type="button" label="Abierto" className="ui-button-warning" onClick={() => this.closeComplaint(rowData)}></Button>
+                    )
+                case 'Cerrado':
+                    return (
+                        <spam>Cerrado</spam>
+                    );
+            }
         }
     }
     viewModalImage(image) {
@@ -307,7 +322,8 @@ export class Complaint extends Component {
             if (this.state.selectedComplaint.state != 'Cerrado') {
                 var x = null;
                 x = this.state.selectedComplaint;
-                var d = formattedStringtoDate(x.dateComplaint);
+                var d = Date.parse(x.dateComplaint);
+                d = new Date(d);
                 var ap = '';
                 if (x.applyReturn)
                     ap = 'SI'
@@ -348,13 +364,17 @@ export class Complaint extends Component {
     saveProblem() {
         if (this.state.newCar) {
             this.state.problem.pictureStringB64 = this.state.imageC;
+            this.state.problem.nameFileP = this.state.imageCName;
+            this.state.problem.extensionFileP = this.state.imageCExten;
             this.state.listProblemsC.push(this.state.problem);
         }
         else {
             this.state.listProblemsC[this.findSelectedProblemIndex()] = this.state.problem;
             this.state.problem.pictureStringB64 = this.state.imageC;
+            this.state.problem.nameFileP = this.state.imageCName;
+            this.state.problem.extensionFileP = this.state.imageCExten;
         }
-        this.setState({ selectedProblem: null, problem: null, imageC: null, displayDialogP: false });
+        this.setState({ selectedProblem: null, problem: null, imageC: null, imageCName: null, imageCExten: null, displayDialogP: false });
     }
     savePAP() {
         debugger
@@ -365,8 +385,10 @@ export class Complaint extends Component {
         }
         else {
             this.state.listPAPC[this.findSelectedPAPIndex()] = this.state.PAP;
-            let dateTmp = formattedDate(this.state.PAP.dateLimit);
-            this.state.PAP.dateLimit = dateTmp;
+            if (typeof this.state.PAP.dateLimit !== 'string') {
+                let dateTmp = formattedDate(this.state.PAP.dateLimit);
+                this.state.PAP.dateLimit = dateTmp;
+            }
         }
         this.setState({ selectedPAP: null, PAP: null, displayDialogPAP: false, datePAPC: null, });
     }
@@ -377,9 +399,6 @@ export class Complaint extends Component {
         return this.state.listProblemsC.indexOf(this.state.selectedProblem);
     }
     findSelectedPAPIndex() {
-        debugger
-        let dtmp = formattedDate(this.state.selectedPAP.dateLimit);
-        this.state.selectedPAP.dateLimit = null;
         return this.state.listPAPC.indexOf(this.state.selectedPAP);
     }
     updatePropertyEA(property, value) {
@@ -440,9 +459,11 @@ export class Complaint extends Component {
     onPAPSelect(e) {
         debugger
         this.state.newCar = false;
+        var date1 = new Date(e.data.dateLimit);
+        date1 = new Date(date1.getTime() + 1000 * 60 * 60 * 24);
         this.setState({
             displayDialogPAP: true,
-            datePAPC: formattedStringtoDate(e.data.dateLimit),
+            datePAPC: date1,
             PAP: Object.assign({}, e.data)
         });
     }
@@ -469,21 +490,25 @@ export class Complaint extends Component {
         var percentTmp = 0;
         var tATmp = 0;
         var aATmp = 0;
-        if (this.state.affectAmountC != null) {
+        if ((this.state.affectAmountC !== null) & (this.state.affectAmountC !== "")) {
             aATmp = parseFloat(this.state.affectAmountC);
         }
-        if (this.state.totalAmountC != null)
+        if ((this.state.totalAmountC !== null) & (this.state.totalAmountC !== ""))
             tATmp = parseFloat(this.state.totalAmountC);
 
         switch (idText) {
             case 'totalAmount':
                 let tM = parseFloat(value);
-                percentTmp = ((aM / tM) * 100).toFixed(2);
+                if (aATmp !== 0 & tM !== undefined) {
+                    percentTmp = ((aATmp / tM) * 100).toFixed(2);
+                }
                 that.setState({ totalAmountC: value, percentC: percentTmp });
                 break;
             case 'affectedAmount':
                 let aM = parseFloat(value);
-                percentTmp = ((aM / tATmp) * 100).toFixed(2);
+                if (tATmp !== 0 & aM !== undefined) {
+                    percentTmp = ((aM / tATmp) * 100).toFixed(2);
+                }
                 that.setState({ affectAmountC: value, percentC: percentTmp });
                 break;
         }
@@ -495,13 +520,21 @@ export class Complaint extends Component {
         debugger;
         var pTmp = null;
         var file = event.target.files[0];
-        var reader = new FileReader();
-        reader.onloadend = function () {
-            //console.log('RESULT', reader.result)
-            pTmp = reader.result;
-            that.setState({ imageC: pTmp });
+        var ext = (file.type).split('/');
+        var sizeImage = (file.size) / 1024;
+        if (sizeImage < 650) {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                //console.log('RESULT', reader.result)
+                pTmp = reader.result;
+                that.setState({ imageC: pTmp, imageCName: file.name, imageCExten: ext[1] });
+            }
+            reader.readAsDataURL(file);
+        } else {
+            this.showMessage('Error, tamaño de la imagen excedido !', 'error');
+            that.setState({ imageC: null, imageCName: null, imageCExten: null });
         }
-        reader.readAsDataURL(file);
+
     }
 
     /* Tratamient */
@@ -599,23 +632,29 @@ export class Complaint extends Component {
     generateReport() {
         if (Object.keys(this.state.selectedComplaint).length !== 0) {
             var data = { idComplaint: this.state.selectedComplaint.idComplaint };
+            show_msgPW();
             GenerateReportComplaint(data, function (data, status, msg) {
                 switch (status) {
                     case 'OK':
+                        hide_msgPW();
                         that.showMessage(msg, 'success');
-                        let contacts = ['anunez@imptek.com']
+                        //let contacts = 'anunez@imptek.com';
                         let subject = 'Reclamo MP ' + that.state.selectedComplaint.product.nameProduct;
                         let msgEmail = 'Estimados. \nAdjunto el documento RMP' + that.state.selectedComplaint.idComplaint + ' ' + that.state.selectedComplaint.product.nameProduct;
-                        setParamsSendEmail(data.filePath, subject, msgEmail, contacts);
+                        setParamsSendEmail(data.filePath, subject, msgEmail);
                         break;
                     case 'ERROR':
+                        hide_msgPW();
                         that.showMessage(msg, 'error');
                         break;
                     default:
+                        hide_msgPW();
                         that.showMessage(msg, 'info');
                         break;
                 }
             })
+        } else {
+            this.showMessage('Para generar el reporte debe seleccionar un problema', 'error')
         }
     }
 
@@ -646,7 +685,27 @@ export class Complaint extends Component {
         })
     }
 
+    /* Método para restringir el usuario de Consulta con el de Edición Compras/ Calidad */
+    validateTypeUser() {
+        var sesion = JSON.parse(localStorage.getItem('dataSession'));
+        if (sesion != null) {
+            switch (sesion.employee.area.nameArea.toUpperCase()) {
+                case 'COMPRAS':
+                    return 'none';
+                case 'CALIDAD':
+                    return '';
+                default:
+                    return 'none';
+            }
+        } else {
+            console.log('No valida type User')
+        }
+
+
+    }
+
     componentWillMount() {
+        debugger
         nameProducts = [];
         GetAllComplaintsRMP(function (data, status, msg) {
             debugger;
@@ -666,9 +725,10 @@ export class Complaint extends Component {
         var productsMP = [];
         GetAllProducts(function (items) {
             items.map(function (value, index) {
+                nameProducts.push(value.nameProduct);
+                productsMP.push(value);
                 if (value.typeProduct == 'MP') {
-                    nameProducts.push(value.nameProduct);
-                    productsMP.push(value);
+
                 }
 
             })
@@ -694,7 +754,7 @@ export class Complaint extends Component {
         };
         const footerDetail = (
             <div>
-                <Button label="Aceptar" icon="fa-check" className="ui-button-primary" onClick={() => this.setState({ visibleMRMPDetails: false, listExecutedActionsC: [], listPAPC: [], listProblemsC: [], nameProductC:'' })} />
+                <Button label="Aceptar" icon="fa-check" className="ui-button-primary" onClick={() => this.setState({ visibleMRMPDetails: false, listExecutedActionsC: [], listPAPC: [], listProblemsC: [], nameProductC: '' })} />
             </div>
         );
         const footerEdit = (
@@ -702,10 +762,24 @@ export class Complaint extends Component {
                 <Button label="Aceptar" icon="fa-check" className="ui-button-primary" onClick={this.saveUpdateComplaint} />
                 <Button label="Cancelar" icon="fa-times" className="ui-button-danger" onClick={() => this.setState({
                     visibleMRMPEditar: false, detailNCPC: '', providerC: '', batchProviderC: '',
-                    totalAmountC: '', affectAmountC: '', percentC: '', affectedProductC: '', nameProduct: '', nameProductC: '', optionDisplayC: 'none'
+                    totalAmountC: '', affectAmountC: '', percentC: '', affectedProductC: '', nameProduct: '', nameProductC: '', optionDisplayC: 'none', datePAPC: null, PAP: null, problem: null, EAction: null
                 })} />
             </div>
         );
+        let headerGroupTableComplant = <ColumnGroup>
+            <Row>
+                <Column header="PNC.08" style={{ width: '7%', textAlign: 'center', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Fecha" style={{ width: '15%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Materia Prima" style={{ width: '22%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Detalle NC" style={{ width: '29%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Proveedor" style={{ width: '17%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Cantidad Total" style={{ width: '10%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Cantidad Afectada" style={{ width: '10%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="% PNC" style={{ width: '10%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Detalles" style={{ width: '10%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Estado" style={{ width: '8%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+            </Row>
+        </ColumnGroup>
         let headerGroup = <ColumnGroup>
             <Row>
                 <Column header="Item" style={{ width: '7%', backgroundColor: '#bbdefb' }} />
@@ -759,11 +833,14 @@ export class Complaint extends Component {
             <div className="ui-g">
                 <Growl ref={(el) => this.growl = el} />
                 <Email />
-                <div className="ui-g-12 ui-lg-12" style={{ justifyContent: 'center', alignContent: 'center' }}>
-                    <div className="card" style={{ backgroundColor: '#d4e157', justifyContent: 'center' }}>
-                        <h1 >PROBLEMAS DE CALIDAD DE MATERIAS PRIMAS</h1>
+                <PW />
+                <Card className="ui-g-12 ui-lg-12" style={{ padding: '0px' }}>
+                    <div className="ui-g-12 ui-lg-12" style={{ justifyContent: 'center', alignContent: 'center' }}>
+                        <div className="card" style={{ backgroundColor: '#d4e157', justifyContent: 'center' }}>
+                            <h1 style={{ paddingTop: '2px' }}>PROBLEMAS DE MATERIA PRIMA</h1>
+                        </div>
                     </div>
-                </div>
+                </Card>
                 <div className="ui-g-12 ui-lg-12">
                     <div className="card card-w-title">
                         <Toolbar>
@@ -772,14 +849,14 @@ export class Complaint extends Component {
                                 <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Buscar" size="35" />
                             </div>
                             <div className="ui-toolbar-group-left">
-                                <Button icon="fa-plus" label="Añadir" onClick={this.addComplaint} />
-                                <Button icon="fa-edit" label="Editar" className="ui-button-warning" onClick={() => this.editComplaint()} />
-                                <Button icon="fa fa-file-pdf-o" label='Reporte' className="ui-button-success" onClick={() => this.generateReport()} />
+                                <Button icon="fa-plus" label="Añadir" onClick={this.addComplaint} style={{ display: this.validateTypeUser() }} />
+                                <Button icon="fa-edit" label="Editar" className="ui-button-warning" onClick={() => this.editComplaint()} style={{ display: this.validateTypeUser() }} />
+                                <Button icon="fa fa-file-pdf-o" label='Reporte' className="ui-button-success" onClick={() => this.generateReport()} style={{ display: this.validateTypeUser() }} />
                             </div>
                         </Toolbar>
-                        <DataTable value={this.state.dataTable} selectionMode="single" paginator={true} rows={15} globalFilter={this.state.globalFilter}
+                        <DataTable value={this.state.dataTable} headerColumnGroup={headerGroupTableComplant} selectionMode="single" paginator={true} rows={12} globalFilter={this.state.globalFilter} scrollable scrollHeight="600px"
                             selection={this.state.selectedComplaint} onRowSelect={this.onComplaintSelect} onSelectionChange={(e) => { this.setState({ selectedComplaint: e.data }); }} responsive={true}>
-                            <Column field="idComplaint" header="PNC.08" style={{ width: '7%', textAlign: 'center' }} />
+                            <Column field="idComplaint" header="PNC.08" style={{ width: '7%', textAlign: 'center', }} />
                             <Column field="dateComplaint" header="Fecha" style={{ width: '15%' }} />
                             <Column field="product.nameProduct" header="Materia Prima" style={{ width: '23%' }} />
                             <Column field="detailNCP" header="Detalle NC" style={{ width: '28%' }} />
@@ -852,8 +929,8 @@ export class Complaint extends Component {
                         </div>
                     </Card>
                 </Dialog>
-                <Dialog visible={this.state.viewModalImg} style={{ width: '20vw', justifyContent: 'center', textAlign: 'center' }} onHide={() => this.setState({ viewModalImg: false })} closeOnEscape >
-                    <img src={this.state.srcImageVM} alt="Galleria 1" style={{ width: '300px', borderRadius: '7px' }} />
+                <Dialog visible={this.state.viewModalImg} style={{ width: '30vw', justifyContent: 'center', textAlign: 'center' }} onHide={() => this.setState({ viewModalImg: false })} closeOnEscape >
+                    <img src={this.state.srcImageVM} alt="Galleria 1" style={{ width: '500px', borderRadius: '7px' }} />
                 </Dialog>
                 <Dialog header="Crear/Editar" visible={this.state.visibleMRMPEditar} style={{ width: '60vw', backgroundColor: '#eceff1' }} footer={footerEdit} modal={true} onHide={() => this.setState({ visibleMRMPEditar: false, optionDisplayC: 'none' })}>
                     <Card style={{ backgroundColor: '#dcedc8', display: this.state.optionDisplayC }} >

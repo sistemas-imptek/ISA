@@ -21,7 +21,7 @@ export class Email extends Component {
             waitModalView: false,
             visibleModalEmail: false,
             pathFile: null,
-            sendTo: ['anunez@imptek.com'],
+            sendTo: [],
             sendSubject: '',
             sendMessage: '',
             messageEmail: ''
@@ -64,6 +64,11 @@ export class Email extends Component {
         }
     }
 
+    componentWillMount() {
+        console.log("Inicio Email");
+        this.setState({ sendTo: [] });
+    }
+
     changeChipsAdd(e) {
         debugger
         var aux = this.state.sendTo;
@@ -82,8 +87,9 @@ export class Email extends Component {
         this.setState({ sendTo: filtered });
     }
     closeModalEmail() {
+        var aux = [];
         that.setState({
-            visibleModalEmail: false, sendTo:[]
+            visibleModalEmail: false, sendTo: aux, sendSubject: '', sendMessage: '',
         });
     }
 
@@ -170,5 +176,5 @@ export class Email extends Component {
 
 export function setParamsSendEmail(file, subject, msgEmail) {
     //that.changeChipsAdd('diegoalpala91@gmail.com');
-    that.setState({ pathFile: file, visibleModalEmail: true, sendSubject: subject, sendMessage: msgEmail });
+    that.setState({ pathFile: file, visibleModalEmail: true, sendSubject: subject, sendMessage: msgEmail, sendTo: [] });
 }

@@ -1,4 +1,7 @@
 /* Archivo que contiene el formato de fechas */
+var monthNames = ["ene.", "feb.", "mar.", "abri.", "may.", "jun.",
+    "jul.", "ago.", "sep.", "oct.", "nov.", "dec."
+];
 
 export function formattedDate(d) {
     try {
@@ -55,7 +58,47 @@ function addZero(i) {
     return i;
 }
 
-export function formattedStringtoDate(s){
-    var d = new Date(s);
+export function formattedStringtoDate(s) {
+    debugger
+    if (s = !null) {
+        var d = Date.parse(s);
+        d = new Date(d);
+        return d;
+    } else {
+        return null;
+    }
+
+}
+
+export function getDatenow() {
+    var d = formattedDate(new Date());
+
     return d;
+}
+
+export function getHourFromDate(date) {
+    try {
+        var h = addZero(date.getHours());
+        var m = addZero(date.getMinutes());
+        return (h + ':' + m);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+export function getDateWithNameMonth(date) {
+    try {
+        var d = new Date();
+        var dia = addZero(date.getDate());
+        var mes = addZero(date.getMonth()+1);
+        if (date.getFullYear() == d.getFullYear()) {
+            return (date.getDate() + ' ' + monthNames[date.getMonth() + 1]);
+        } else {
+            return (dia + '/' + mes+'/' + date.getFullYear());
+        }
+
+    } catch (e) {
+        console.log(e);
+    }
+
 }

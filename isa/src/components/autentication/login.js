@@ -12,6 +12,7 @@ import { HCC } from '../quality-development/Hcc';
 import { ProductoNoConforme } from '../quality-development/Pnc'
 import { ResultTest } from '../quality-development/TestResuts';
 import { Complaint } from '../quality-development/ReclamosMP';
+import { WFlow } from '../quality-development/WorkFlow';
 import { Documentation } from '../Documentation';
 import { Router, Route, hashHistory } from 'react-router';
 import AddPropsToRoute from './test';
@@ -256,6 +257,7 @@ export class Login extends Component {
                         <Route path="/quality-development/pnc" component={ProductoNoConforme} />
                         <Route path="/quality-development/resulttest" component={ResultTest} />
                         <Route path="/quality-development/complaint" component={Complaint} />
+                        <Route path="/quality-development/wflow" component={WFlow} />
                     </Route>
                 </Router>,
 

@@ -584,15 +584,21 @@ export class IngresoMPForm extends Component {
         })
 
         if (Object.entries(objPV).length !== 0) {
-            objPV.idProvider = that.state.provider;
-            objPV.dateLog = formattedDateAndHour(that.state.date);
-            objPV.sapCode = that.state.dataProduct.sapCode;
-            objPV.productName = that.state.dataProduct.nameProduct;
-            objPV.idProduct = that.state.dataProduct.idProduct;
-            objPV.batchTest = that.state.batchEnter;
-            objPV.prommissing = true;
-            objPV.owner = that.state.userLogin.idUser;
-            dataSend.push(objPV);
+            Object.keys(objPV).map(function (o) {
+                var oAux = { idProperty: null, test_result_view: null };
+                oAux.idProperty = o;
+                oAux.test_result_view = objPV[o];
+                oAux.idProvider = that.state.provider;
+                oAux.dateLog = formattedDateAndHour(that.state.date);
+                oAux.sapCode = that.state.dataProduct.sapCode;
+                oAux.productName = that.state.dataProduct.nameProduct;
+                oAux.idProduct = that.state.dataProduct.idProduct;
+                oAux.batchTest = that.state.batchEnter;
+                oAux.prommissing = true;
+                oAux.owner = that.state.userLogin.idUser;
+                dataSend.push(oAux);
+            })
+
         }
         if (dataSend.length !== 0) {
             SaveTest(dataSend, function (data, status, msg) {

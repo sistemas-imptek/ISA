@@ -35,7 +35,16 @@ var Transactions = {
     SaveComplaintMP: { transactionName: "SaveComplaint", transactionCode: "TxQQRsaveComplaint", parameters: {} },
     GetAllComplaint: { transactionName: "GetAllComplaint", transactionCode: "TxQQRgetAllComplaint", parameters: {} },
     SaveProblem: { transactionName: "SaveProblem", transactionCode: "TxQQRsaveProblem", parameters: {} },
-    GenerateReportComplaint:{ transactionName: "GenerateReportComplaint", transactionCode: "TxQQRgenerateReportComplaint", parameters: {}},
+    GenerateReportComplaint: { transactionName: "GenerateReportComplaint", transactionCode: "TxQQRgenerateReportComplaint", parameters: {} },
+    GetAllProviders: { transactionName: "GetAllProviders", transactionCode: "TxQQRgetAllProviders", parameters: {} },
+    SaveProcessStart: { transactionName: "SetProcessFlow", transactionCode: "TxQQRsetProcessFlow", parameters: {} },
+    GetNotificationsProcess: { transactionName: "GetTrayProcess", transactionCode: "TxQQRgetTrayProcess", parameters: {} },
+    DowloadFileS: { transactionName: "DownloadFile", transactionCode: "TxQQRDownloadFile", parameters: {} },
+    ValidateDeliverMaterial: { transactionName: "ValidateDeliverMaterial", transactionCode: "TxQQRvalidateDeliverMaterial", parameters: {} },
+    RespondProcessFlow: { transactionName: "ReplyProcessFlow", transactionCode: "TxQQRReplyProcessFlow", parameters: {} },
+    GenerateReportDDP04: { transactionName: "GenerateReportProcessTestRequest", transactionCode: "TxQQRgenerateReportProcessTestRequest", parameters: {} },
+    OrderMP: { transactionName: "OrderMP", transactionCode: "TxQQROrderMP", parameters: {} },
+    AvailableMP: { transactionName: "AvailableMP", transactionCode: "TxQQRAvailableMP", parameters: {} },
 
 }
 
@@ -217,3 +226,65 @@ export function GenerateReportComplaint(data, addFunction) {
     transaction.parameters = data;
     SendPostRequestToService(transaction, addFunction, 'TxQuality');
 }
+
+export function GetAllProviders(addFunction) {
+    var transaction = Transactions.GetAllProviders;
+    transaction.parameters = {};
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function SaveProcessStart(data, addFunction) {
+    var transaction = Transactions.SaveProcessStart;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function GetNotifications(data, addFunction) {
+    var transaction = Transactions.GetNotificationsProcess;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function DownloadFileFromServer(data, addFunction) {
+    var transaction = Transactions.DowloadFileS;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function ValidateDeliverMaterial(data, addFunction) {
+    var transaction = Transactions.ValidateDeliverMaterial;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function RespondProcessFlow(data, addFunction) {
+    var transaction = Transactions.RespondProcessFlow;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function GenerateReportDDP04(data, addFunction) {
+    var transaction = Transactions.GenerateReportDDP04;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function TxOrderMP(data, addFunction) {
+    var transaction = Transactions.OrderMP;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function TxAvailableMP(data, addFunction) {
+    var transaction = Transactions.AvailableMP;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};

@@ -18,6 +18,8 @@ import { Growl } from 'primereact/components/growl/Growl';
 import { RadioButton } from 'primereact/components/radiobutton/RadioButton';
 import { Chips } from 'primereact/components/chips/Chips';
 import { ProgressSpinner } from 'primereact/components/progressspinner/ProgressSpinner';
+import { ColumnGroup } from 'primereact/components/columngroup/ColumnGroup';
+import { Row } from 'primereact/components/row/Row';
 
 /* ============  D A T A    C A T A L O G O  S =============== */
 import { periocidad, tipoProducto, abbreviation } from '../../global/catalogs';
@@ -26,7 +28,7 @@ import { periocidad, tipoProducto, abbreviation } from '../../global/catalogs';
 import { GetAllProducts, GetProductById, GenerateHCC, HCCSave, GetAllHCCs, GenerateCertificate, GetAllClients, SendEmail } from '../../utils/TransactionsCalidad';
 
 /* ====================  U T I L S  ======== */
-import { formattedDate } from '../../utils/FormatDate';
+import { formattedDate, formattedStringtoDate } from '../../utils/FormatDate';
 
 
 var nameProducts = []; // Variable para fomrar el Array de nombre de productos.
@@ -254,7 +256,11 @@ export class HCC extends Component {
                         objAux.value = obj.idProvider;
                         proveedoresMP.push(objAux);
                     })
-                    that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '' })
+                    var hccHeadIdProvider = item.idProviderMP;
+                    var hccHeadDateTests = null
+                    if (item.dateOrder != null)
+                        hccHeadDateTests = formattedStringtoDate(item.dateOrder);
+                    that.setState({ hCC: item, pnlCabeceraMP: '', pnlCabeceraPT: 'none', specificationPanel: '', specificationList: '', btnGuardarHCC: '', resultsPanel: '', proveedor: hccHeadIdProvider, receptDate: hccHeadDateTests })
 
                 }
             })
@@ -512,7 +518,7 @@ export class HCC extends Component {
             productName: '',
             lote: '', observation: '', analysis: '', hccPT: '', hccOF: '', referralGuide: '', reloadTextInput: false, hCC: {}, productionDate: undefined, dateOrder: undefined,
             visibleModalEmail: false,
-            clientName:undefined, abbreValue: undefined
+            clientName: undefined, abbreValue: undefined
         });
     }
 
@@ -520,10 +526,13 @@ export class HCC extends Component {
     generateCertificate() {
         var objAux = { hccHead: { sapCode: '' }, clientImptek: { idClient: undefined, nameClient: undefined }, email: '', clientPrint: '' };
         objAux.clientImptek.idClient = this.findObjCliente(this.state.clientName);
-        objAux.clientImptek.nameClient=this.state.clientName
+        objAux.clientImptek.nameClient = this.state.clientName
         objAux.hccHead.sapCode = this.state.selectedHCC.sapCode;
         objAux.email = this.state.email;
-        objAux.clientPrint = this.state.abbreValue + '.' + ' ' + this.state.clientName;
+        if (this.state.abbreValue == 'Otro')
+            objAux.clientPrint = this.state.otroAbrebbation + '.' + ' ' + this.state.clientName;
+        else
+            objAux.clientPrint = this.state.abbreValue + '.' + ' ' + this.state.clientName;
         if ((this.state.abbreValue !== undefined) & (this.state.clientName !== undefined)) {
             this.setState({ waitModalView: true })
             GenerateCertificate(objAux, function (data, status, msg) {
@@ -531,7 +540,11 @@ export class HCC extends Component {
                 switch (status) {
                     case 'OK':
                         that.showSuccess(msg);
-                        var temp = 'Estimado\n' + that.state.abbreValue + '. ' + that.state.clientName;
+                        var temp = '';
+                        if (that.state.abbreValue == 'Otro')
+                            temp = 'Estimado\n' + that.state.otroAbrebbation + '. ' + that.state.clientName;
+                        else
+                            temp = 'Estimado\n' + that.state.abbreValue + '. ' + that.state.clientName;
                         that.setState({
                             dialogCertificate: false, cliente: '', order: '', visibleModalEmail: true, sendTo: [], sendMessage: temp, sendSubject: 'Certificado de Calidad',
                             pathFile: data.filePath
@@ -604,6 +617,17 @@ export class HCC extends Component {
             <Button className='ui-button-danger' icon="fa fa-close" label="Cancelar" onClick={this.closeModalCertificate} />
             <Button className='ui-button-success' label="Aceptar" icon="fa-check" onClick={this.generateCertificate} />
         </div>;
+        let headerGroupTableHCC = <ColumnGroup>
+            <Row>
+                <Column header="HCC" style={{ width: '10%', textAlign: 'center', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Lote" style={{ width: '10%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Producto" style={{ width: '25%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Fecha" style={{ width: '10%', backgroundColor: '#337ab7', color: '#ffffff' }} />
+                <Column header="Análisis" style={{ width: '35%', backgroundColor: '#4DA6DE', color: '#ffffff' }} />
+                <Column header="Certificado" style={{ width: '10%', backgroundColor: '#337ab7', color: '#ffffff', justifyContent: 'center', textAlign: 'center' }} />
+            </Row>
+        </ColumnGroup>
+
         return (
             <div>
                 <Dialog visible={this.state.waitModalView} style={{ width: '20vw' }} modal={true} showHeader={false} closeOnEscape={false} onHide={() => this.setState({ waitModalView: false })}>
@@ -658,7 +682,7 @@ export class HCC extends Component {
                 <TabView style={{ marginBottom: '10px' }}>
 
                     <TabPanel header="Consultar HCC" leftIcon="fa fa-product-hunt">
-                        <div className="card card-w-title">
+                        {/* <div className="card " style={{ padding: '0px', background: '#4DA6DE' }}>
                             <div className="ui-g">
                                 <div className="ui-g-12 ui-md-1">
                                     <strong>Filtros</strong>
@@ -672,8 +696,20 @@ export class HCC extends Component {
                                     <label htmlFor="rb2" style={{ marginLeft: '5px' }}>Producto Terminado</label>
                                 </div>
                             </div>
-                        </div>
-                        <DataTable value={this.state.hccFilesFilter} paginator={true} rows={15} header={header} globalFilter={this.state.globalFilter}>
+                        </div> */}
+                        <Toolbar style={{backgroundColor:'#337ab7'}}>
+                            <div className="ui-toolbar-group-right">
+                                <i className="fa fa-search" style={{ margin: '4px 4px 0 0', color:'#ffffff' }}></i>
+                                <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Buscar" size="35" />
+                            </div>
+                            <div className="ui-toolbar-group-left">
+                                <RadioButton value="MP" inputId="rb1" onChange={this.onRadioChange} checked={this.state.hccType === "MP"} />
+                                <label htmlFor="rb1" style={{ marginLeft: '5px', marginRight:'10px', color:'#ffffff' }}>MP</label>
+                                <RadioButton value="PT" inputId="rb2" onChange={this.onRadioChange} checked={this.state.hccType === "PT"} />
+                                <label htmlFor="rb2" style={{ marginLeft: '5px', color:'#ffffff' }}>PT</label>
+                            </div>
+                        </Toolbar>
+                        <DataTable value={this.state.hccFilesFilter} paginator={true} rows={15}  headerColumnGroup={headerGroupTableHCC} globalFilter={this.state.globalFilter} scrollable scrollHeight="600px">
                             <Column field="sapCode" header="HCC" style={{ width: '10%' }} />
                             <Column field="hcchBatch" header="Lote" style={{ width: '10%' }} />
                             <Column field="product.nameProduct" header="Producto" style={{ width: '25%' }} />

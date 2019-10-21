@@ -471,64 +471,70 @@ export class ProductoNoConforme extends Component {
         var formPNC = <div>
             <Card style={{ display: this.state.viewForm }}>
                 <div className='ui-g form-group ui-fluid'>
-                    <div className='ui-g-12' style={{ justifyContent: 'center', textAlign: 'center', paddingTop: '0px', borderColor: '#d4e157', borderBottomWidth: 5, borderRadius: 5 }}>
-                        <h1>FORMATO DEL REGISTRO</h1>
-                        <h3>Referencia: MP-PNC.01</h3>
-                        <h3>Tratamiento Del Producto No Conforme</h3>
-                        <h3 style={{ color: '#457fca', fontSize: '20px', marginBottom: '0px' }}>{this.state.productName}</h3>
+                    <div className='ui-g-12 ui-lg-12' style={{
+                        justifyContent: 'center', textAlign: 'center', paddingTop: '0px', background: 'linear-gradient(to bottom, #e3f2fd, #f1f8e9)',
+                        borderTopColor: '#337ab7', borderLeftColor: '#337ab7', borderRightColor: '#337ab7', borderRadius: 5, borderStyle: 'solid', borderBottomColor: '#d4e157'
+                    }}>
+                        <br /><span style={{ fontSize: '20px', fontWeight: 'bold' }}>FORMATO DEL REGISTRO</span><br />
+                        <span style={{ fontWeight: 'inherit' }}>Referencia: MP-PNC.01</span><br />
+                        <span style={{ fontWeight: 'lighter' }}>Tratamiento Del Producto No Conforme</span><br />
+                        <span style={{ color: '#457fca', fontSize: '20px', marginBottom: '0px' }}>{this.state.productName}</span>
+
                     </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Fecha De Producción</label>
-                        <Calendar dateFormat="yy/mm/dd" value={this.state.productionDate} locale={es} showIcon="true" onChange={(e) => this.setState({ productionDate: e.value })}></Calendar>
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Fecha De Detección</label>
-                        <Calendar dateFormat="yy/mm/dd" value={this.state.detectionnDate} locale={es} showIcon="true" onChange={(e) => this.setState({ detectionnDate: e.value })}></Calendar>
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Lote</label>
-                        <InputText placeholder='lote' onChange={(e) => this.setState({ batch: e.target.value })} value={this.state.batch} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Orden de Producción</label>
-                        <InputText placeholder='orden' onChange={(e) => this.setState({ orderProduction: e.target.value })} value={this.state.orderProduction} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">HCC Traspaso Libre Utilización</label>
-                        <InputText placeholder='codigo' onChange={(e) => this.setState({ hccFreeUse: e.target.value })} value={this.state.hccFreeUse} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Procedencia</label>
-                        <Dropdown options={procedencia} value={this.state.source} onChange={this.onDropdownChangeOrigin} autoWidth={false} placeholder="Selecione" />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Cantidad Producida</label>
-                        <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setState({ amountProduced: e.target.value })} value={this.state.amountProduced} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Cantidad No Conforme</label>
-                        <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setCNC(e)} value={this.state.amountNonConforming} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Unidad</label>
-                        <Dropdown options={unidadesMedida} value={this.state.unitNCP} onChange={this.onDropdownChangeUnitNCP} autoWidth={false} placeholder="Selecione" />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Salida de Material</label>
-                        <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setExitMaterial(e)} value={this.state.exitMaterial} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Saldo de Material</label>
-                        <InputText className={this.state.validationTextBalancedMaterial} style={{ background: this.state.vaidationFontTextBalanceMaerial }} disabled={true} keyfilter="money" onChange={(e) => this.setState({ balanceMaterial: e.target.value })} value={this.state.balanceMaterial} />
-                    </div>
-                    <div className='ui-g-2'>
-                        <label htmlFor="float-input">Área</label>
-                        <Dropdown options={areas} value={this.state.area} onChange={this.onDropdownChangeArea} autoWidth={false} placeholder="Selecione" />
-                    </div>
-                    <div className='ui-g-12'>
-                        <div className='ui-g-6'>
+                    <div className='ui-g-12 ui-lg-12' style={{ borderColor: '#337ab7', borderRadius: '8px', borderStyle: 'solid' }}>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Fecha De Producción</label>
+                            <Calendar dateFormat="yy/mm/dd" value={this.state.productionDate} locale={es} showIcon="true" onChange={(e) => this.setState({ productionDate: e.value })}></Calendar>
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Fecha De Detección</label>
+                            <Calendar dateFormat="yy/mm/dd" value={this.state.detectionnDate} locale={es} showIcon="true" onChange={(e) => this.setState({ detectionnDate: e.value })}></Calendar>
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Lote</label>
+                            <InputText placeholder='lote' onChange={(e) => this.setState({ batch: e.target.value })} value={this.state.batch} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Orden de Producción</label>
+                            <InputText placeholder='orden' onChange={(e) => this.setState({ orderProduction: e.target.value })} value={this.state.orderProduction} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">HCC Traspaso Libre Utilización</label>
+                            <InputText placeholder='codigo' onChange={(e) => this.setState({ hccFreeUse: e.target.value })} value={this.state.hccFreeUse} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Procedencia</label>
+                            <Dropdown options={procedencia} value={this.state.source} onChange={this.onDropdownChangeOrigin} autoWidth={false} placeholder="Selecione" />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Cantidad Producida</label>
+                            <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setState({ amountProduced: e.target.value })} value={this.state.amountProduced} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Cantidad No Conforme</label>
+                            <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setCNC(e)} value={this.state.amountNonConforming} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Unidad</label>
+                            <Dropdown options={unidadesMedida} value={this.state.unitNCP} onChange={this.onDropdownChangeUnitNCP} autoWidth={false} placeholder="Selecione" />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Salida de Material</label>
+                            <InputText placeholder='cantidad' keyfilter="money" onChange={(e) => this.setExitMaterial(e)} value={this.state.exitMaterial} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Saldo de Material</label>
+                            <InputText className={this.state.validationTextBalancedMaterial} style={{ background: this.state.vaidationFontTextBalanceMaerial }} disabled={true} keyfilter="money" onChange={(e) => this.setState({ balanceMaterial: e.target.value })} value={this.state.balanceMaterial} />
+                        </div>
+                        <div className='ui-g-12 ui-lg-2'>
+                            <label htmlFor="float-input">Área</label>
+                            <Dropdown options={areas} value={this.state.area} onChange={this.onDropdownChangeArea} autoWidth={false} placeholder="Selecione" />
+                        </div>
+
+                        <div className='ui-g-12 ui-lg-6'>
                             <label htmlFor="float-input">Defectos</label>
-                            <Dropdown options={defects} value={this.state.defect} onChange={this.onDropdownChangeDefect} autoWidth={false} placeholder="Selecione" />
+                            {/* <Dropdown options={defects} value={this.state.defect} onChange={this.onDropdownChangeDefect} autoWidth={false} placeholder="Selecione" /> */}
+                            <InputTextarea rows={3} value={this.state.defect} onChange={(e) => this.setState({ defect: e.target.value })} />
                             <div className='ui-g-8' style={{ display: this.state.viewOtherDefect }}>
                                 <div style={{ marginTop: '10px' }}>
                                     <label htmlFor="float-input">Describa</label>
@@ -543,7 +549,7 @@ export class ProductoNoConforme extends Component {
                                 </div>
                             </div>
                         </div>
-                        <div className='ui-g-6'>
+                        <div className='ui-g-12 ui-lg-6'>
                             <label htmlFor="float-input">Observaciones</label>
                             <Dropdown options={cincoMs} value={this.state.fiveM} onChange={this.onDropdownChangeFiveM} autoWidth={false} placeholder="Selecione" />
                             <div style={{ marginTop: '10px', display: this.state.viewOtherFiveM }}>
@@ -551,9 +557,7 @@ export class ProductoNoConforme extends Component {
                                 <InputText placeholder='describa' onChange={(e) => this.setState({ fiveMDescription: e.target.value })} value={this.state.fiveMDescription} />
                             </div>
                         </div>
-                    </div>
-                    <div className='ui-g-12'>
-                        <div className='ui-g-6'>
+                        <div className='ui-g-12 ui-lg-6'>
                             <label htmlFor="float-input">Destino Final</label>
                             <Dropdown options={outMethods} value={this.state.outMethod} onChange={this.onDropdownChangeOutMethod} autoWidth={false} placeholder="Selecione" />
                             <div style={{ marginTop: '10px', display: this.state.viewOtherOutMethod }}>
@@ -561,16 +565,14 @@ export class ProductoNoConforme extends Component {
                                 <InputText placeholder='describa' onChange={(e) => this.setState({ otherOutMethod: e.target.value })} value={this.state.otherOutMethod} />
                             </div>
                         </div>
-                        <div className='ui-g-6'>
+                        <div className='ui-g-12 ui-lg-6'>
                             <label htmlFor="float-input">Descripción del destino del material</label>
                             <InputTextarea rows={7} value={this.state.finalDestination} onChange={(e) => this.setState({ finalDestination: e.target.value })} />
                         </div>
-                    </div>
-                    <div className='ui-g-12'>
-                        <div className='ui-g-6'>
+                        <div className='ui-g-12 ui-lg-6'>
                             {/* <h3>Verificación de Calidad</h3> */}
                             <label htmlFor="float-input">Verificación de Calidad</label>
-                            <DataTable value={this.state.tasks} paginator={true} rows={5} footer={footer}
+                            <DataTable value={this.state.tasks} footer={footer}
                                 selectionMode="single" selection={this.state.selectedTask} onSelectionChange={(e) => { this.setState({ selectedTask: e.data }); }}
                                 onRowSelect={this.onTaskSelect}>
                                 <Column field="descriptionTask" header="Tarea" sortable={true} />
@@ -597,10 +599,20 @@ export class ProductoNoConforme extends Component {
                                 </div>
                             </div>}
                         </Dialog>
-                        <div className='ui-g-6'>
+                        <div className='ui-g-12 ui-lg-6'>
                             <label htmlFor="float-input">Observaciones Adicionales</label>
                             <InputTextarea rows={8} value={this.state.aditionalRemarks} onChange={(e) => this.setState({ aditionalRemarks: e.target.value })} />
                         </div>
+                    </div>
+
+                    <div className='ui-g-12'>
+
+                    </div>
+                    <div className='ui-g-12'>
+
+                    </div>
+                    <div className='ui-g-12'>
+
                     </div>
                 </div>
             </Card>

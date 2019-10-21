@@ -18,6 +18,9 @@ export var tipoProducto = [
 export var unidadesMedida = [
     { label: '°C', value: '°C' },
     { label: '%', value: '%' },
+    { label: 'l', value: 'l' },
+    { label: 'm', value: 'm' },
+    { label: 'g', value: 'g' },
     { label: 'mm', value: 'mm' },
     { label: 'cm', value: 'cm' },
     { label: 'm', value: 'm' },
@@ -89,8 +92,9 @@ export var desicionCMB = [
 /* Variable de acronimo */
 export var abbreviation = [
     { label: 'Sr', value: 'Sr' },
-    { label: 'Sta', value: 'Sta' },
+    { label: 'Srta', value: 'Srta' },
     { label: 'Sra', value: 'Sra' },
+    { label: 'Sres', value: 'Sres' },
     { label: 'Dr', value: 'Dr' },
     { label: 'Dra', value: 'Dra' },
     { label: 'Arq', value: 'Arq' },
@@ -123,6 +127,35 @@ export var placesRMP=[
     { label: 'Producción-Viales', value: 'Producción-Viales' },
 ]
 
+/* Variable de lineas de aplicacion para Solicitud de Ensayos */
+export var aplicationLine=[
+    { label: 'Laminación', value: 'Laminación' },
+    { label: 'Revestimientos', value: 'Revestimientos' },
+    { label: 'Viales', value: 'Viales' },
+]
+
+/* Variable de lineas de aplicacion para Solicitud de Ensayos */
+export var LineDDP04=[
+    { label: 'Laminación', value: 'Laminación' },
+    { label: 'Metales', value: 'Metales' },
+    { label: 'Paneles', value: 'Paneles' },
+    { label: 'Revestimientos', value: 'Revestimientos' },
+    { label: 'Viales', value: 'Viales' },
+]
+
+/* Variable para tipo de Aprobación  */
+export var approbateType=[
+    { label: 'Laboratorio', value: 'Aprobado Laboratorio' },
+    { label: 'Planta', value: 'Aprobado Planta' },
+    { label: 'Libre Uso', value: 'Aprobado Libre Uso' },
+    { label: 'No Aprobado', value: 'No Aprobado' },
+]
+
+/* Variable para Aprobación  */
+export var approbateDesicion=[
+    { label: 'Aprobado', value: 'Aprobado' },
+    { label: 'No Aprobado', value: 'No Aprobado' },
+]
 export var providers = [
     { label: 'Quimicon', value: 1 }
 ]
