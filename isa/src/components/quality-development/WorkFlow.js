@@ -68,9 +68,6 @@ export class WFlow extends Component {
             viewModalSMP: false,
             addFileState: false,
             aproveAndShare: false,
-
-
-
         };
         that = this;
         this.showMessage = this.showMessage.bind(this);

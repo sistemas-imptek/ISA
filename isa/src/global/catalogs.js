@@ -159,3 +159,15 @@ export var approbateDesicion=[
 export var providers = [
     { label: 'Quimicon', value: 1 }
 ]
+
+/* Variable para tipo de Destino final  */
+export var finaltSource=[
+    { label: 'Desecho', value: 'Desecho' },
+    { label: 'Donación', value: 'Donación' },
+    { label: 'Reproceso', value: 'Reproceso' },
+    { label: 'Retrabajo', value: 'Retrabajo' },
+    { label: 'Reclasificado', value: 'Reclasificado' },
+    { label: 'Reparación', value: 'Reparación' },
+    { label: 'Corte de Teja o bandas', value: 'Corte de Teja o bandas' },
+    { label: 'Solicitud de Concesión', value: 'Solicitud de Concesión' },
+]

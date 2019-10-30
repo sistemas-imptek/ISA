@@ -13,6 +13,7 @@ import { ProductoNoConforme } from '../quality-development/Pnc'
 import { ResultTest } from '../quality-development/TestResuts';
 import { Complaint } from '../quality-development/ReclamosMP';
 import { WFlow } from '../quality-development/WorkFlow';
+import { ReportData } from '../quality-development/Report';
 import { Documentation } from '../Documentation';
 import { Router, Route, hashHistory } from 'react-router';
 import AddPropsToRoute from './test';
@@ -165,7 +166,7 @@ export class Login extends Component {
                 marginBottom: "30px",
                 fontWeight: "800",
                 fontSize: "30px",
-            color: "#DE6262"
+                color: "#DE6262"
             },
             login_sec_h2_after: {
                 "content": "\" \"",
@@ -210,33 +211,34 @@ export class Login extends Component {
         if (this.state.stateLogin) {
             return (
                 <div style={{
-                    background: 'linear-gradient(to bottom, #4DA6DE, #D1DA28)', width: '100%', height: '100%', padding: '180px' }}>
+                    background: 'linear-gradient(to bottom, #4DA6DE, #D1DA28)', width: '100%', height: '100%', padding: '180px'
+                }}>
                     <Growl ref={(el) => this.growl = el} />
                     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
                     {/*---- Include the above in your HEAD tag --------*/}
                     <div className='ui-g form-group ui-fluid' style={{ justifyContent: 'center' }}>
                         <div className='ui-g-6' style={{ background: '#fff', borderRadius: "10px", boxShadow: "15px 20px 0px rgba(0,0,0,0.1)" }}>
                             <div className="ui-g-6" style={{ padding: "50px 30px", position: "relative" }} >
-                                <h2 className="text-center" style={{marginBottom: "30px",fontWeight: "800",fontSize: "30px",color: "#4DA6DE"}}>Iniciar Sesión</h2>
+                                <h2 className="text-center" style={{ marginBottom: "30px", fontWeight: "800", fontSize: "30px", color: "#4DA6DE" }}>Iniciar Sesión</h2>
                                 <div className="login-form">
                                     <div className="form-group">
                                         <label htmlFor="exampleInputEmail1" className="text-uppercase">Usuario</label>
-                                        <input type="text" className="form-control" placeholder onChange={(e) => this.setState({ user: e.target.value })}/>
+                                        <input type="text" className="form-control" placeholder onChange={(e) => this.setState({ user: e.target.value })} />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="exampleInputPassword1" className="text-uppercase">Contraseña</label>
                                         <input type="password" className="form-control" placeholder onChange={(e) => this.setState({ password: e.target.value })} />
                                     </div>
                                     <div className="form-check">
-                                        
-                                        <button className="btn float-right" style={{ background: "#4DA6DE",color: "#fff",fontWeight: "600"}} onClick={this.validateUser} >Aceptar</button>
+
+                                        <button className="btn float-right" style={{ background: "#4DA6DE", color: "#fff", fontWeight: "600" }} onClick={this.validateUser} >Aceptar</button>
                                     </div>
                                 </div>
                                 {/* <div className="copy-text">Elaborado por T.I ASTS <i className="fa fa-heart" /> by <a href="http://grafreez.com">Grafreez.com</a></div> */}
-                                <div className="copy-text" style={{position: "absolute",width: "80%", bottom: "20px",fontSize: "13px", textAlign: "center"}} >Elaborado por el área T.I </div>
+                                <div className="copy-text" style={{ position: "absolute", width: "80%", bottom: "20px", fontSize: "13px", textAlign: "center" }} >Elaborado por el área T.I </div>
                             </div>
-                            <div className="ui-g-6 banner-sec" style={{background:'#4DA6DE', borderRadius: "0 10px 10px 0",height:'100%', padding: "0",alignSelf:'center' }}>
-                                <img style={{ justifyContent: 'center', textAlign: 'center', marginTop: '60px', width:'100%', height:'60%', paddingLeft:'15px', paddingRight:'15px' }} src="assets/layout/images/logo-imptek-white.svg" />
+                            <div className="ui-g-6 banner-sec" style={{ background: '#4DA6DE', borderRadius: "0 10px 10px 0", height: '100%', padding: "0", alignSelf: 'center' }}>
+                                <img style={{ justifyContent: 'center', textAlign: 'center', marginTop: '60px', width: '100%', height: '60%', paddingLeft: '15px', paddingRight: '15px' }} src="assets/layout/images/logo-imptek-white.svg" />
                             </div>
                         </div>
                     </div>
@@ -258,6 +260,7 @@ export class Login extends Component {
                         <Route path="/quality-development/resulttest" component={ResultTest} />
                         <Route path="/quality-development/complaint" component={Complaint} />
                         <Route path="/quality-development/wflow" component={WFlow} />
+                        <Route path="/quality-development/report" component={ReportData} />
                     </Route>
                 </Router>,
 
@@ -270,6 +273,6 @@ export class Login extends Component {
 
 }
 
-export function logout(){
-    that.setState({stateLogin: true})
+export function logout() {
+    that.setState({ stateLogin: true })
 }

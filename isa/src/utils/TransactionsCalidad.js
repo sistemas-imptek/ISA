@@ -23,6 +23,7 @@ var Transactions = {
     GetAllHCC: { transactionName: "GetAllHCC_TP", transactionCode: "TxQQRgetHCCTP", parameters: null },
     GetAllPNC: { transactionName: "GetAllNCP", transactionCode: "TxQQRgeAlltNCP", parameters: "" },
     PNCSave: { transactionName: "SetNCP", transactionCode: "TxQQRsetNCP", parameters: {} },
+    SaveExitMaterialHistory: { transactionName: "SaveExitMaterial", transactionCode: "TxQQRsaveExitMaterial", parameters: {} },
     ClosePNC: { transactionName: "Close NCP", transactionCode: "TxQQRcloseNCP", parameters: { idNCP: 0 } },
     GetAllClients: { transactionName: "GetAllClients", transactionCode: "TxQQRGAC", parameters: null },
     SaveTest: { transactionName: "SaveTest", transactionCode: "TxQQRsaveTest", parameters: {} },
@@ -45,6 +46,7 @@ var Transactions = {
     GenerateReportDDP04: { transactionName: "GenerateReportProcessTestRequest", transactionCode: "TxQQRgenerateReportProcessTestRequest", parameters: {} },
     OrderMP: { transactionName: "OrderMP", transactionCode: "TxQQROrderMP", parameters: {} },
     AvailableMP: { transactionName: "AvailableMP", transactionCode: "TxQQRAvailableMP", parameters: {} },
+    GenerateDataReport: { transactionName: "GenerateDataReport", transactionCode: "TxQQRgenerateDataReport", parameters: {} },
 
 }
 
@@ -133,6 +135,13 @@ export function ClosedPNC(idPNC, addFunction) {
     var transaction = Transactions.ClosePNC;
     transaction.parameters = { idNCP: 0 };
     transaction.parameters.idNCP = idPNC;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+}
+
+export function SaveExitMaterialHistory(data, addFunction) {
+    var transaction = Transactions.SaveExitMaterialHistory;
+    transaction.parameters = { };
+    transaction.parameters = data;
     SendPostRequestToService(transaction, addFunction, 'TxQuality');
 }
 
@@ -284,6 +293,13 @@ export function TxOrderMP(data, addFunction) {
 
 export function TxAvailableMP(data, addFunction) {
     var transaction = Transactions.AvailableMP;
+    transaction.parameters = {};
+    transaction.parameters = data;
+    SendPostRequestToService(transaction, addFunction, 'TxQuality');
+};
+
+export function GenerateDataReport(data, addFunction) {
+    var transaction = Transactions.GenerateDataReport;
     transaction.parameters = {};
     transaction.parameters = data;
     SendPostRequestToService(transaction, addFunction, 'TxQuality');
