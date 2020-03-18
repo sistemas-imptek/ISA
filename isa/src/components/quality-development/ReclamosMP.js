@@ -312,7 +312,7 @@ export class Complaint extends Component {
 
     /* Método para añadir Reclamo */
     addComplaint() {
-        this.setState({ visibleMRMPEditar: true, optionDisplayC: '' });
+        this.setState({ visibleMRMPEditar: true, optionDisplayC: '', selectedComplaint: {}, selectedComplaint2:{} });
     }
 
     /* Metodo para editar el Complaint(Reclamo)  */
